@@ -1,14 +1,73 @@
-import React from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { removeFromWishlist, addToCart } from "../../redux/orebiSlice";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { useCart } from "../../context/CartContext";
+import { Link, useNavigate } from "react-router-dom";
 import { FaTrash, FaCartPlus } from "react-icons/fa";
+import api from "../../api"; // ✅ your axios instance
+import { toast } from "react-toastify";
 
 const WishlistPage = () => {
-  const wishlistItems = useSelector((state) => state.orebiReducer.wishlist);
+  const navigate = useNavigate();
+  const { addToCart } = useCart();
   const dispatch = useDispatch();
+  const [wishlistItems, setWishlistItems] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  if (!wishlistItems) return <p className="p-4">Loading wishlist...</p>;
+  // ✅ Get wishlist from backend
+  useEffect(() => {
+    const fetchWishlist = async () => {
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (!user) {
+        navigate('/login');
+        toast.warning("Please login to see your wishlist");
+        setLoading(false); 
+        return;
+      }
+
+      try {
+        const res = await api.get(`/wishlist/${user.id}`);
+        if (res.data.status) {
+          // backend returns wishlist items with "product" relation
+          const items = res.data.data.map((w) => ({
+            id: w.product.id,
+            name: w.product.name,
+            price: w.product.price,
+            image: w.product.image
+              ? `${process.env.REACT_APP_API_URL}/storage/${w.product.image}`
+              : "/placeholder.jpg",
+          }));
+          setWishlistItems(items);
+        }
+      } catch (err) {
+        console.error(err);
+        toast.error("Failed to fetch wishlist");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchWishlist();
+  }, []);
+
+  // ✅ Handle remove wishlist item
+  const handleRemove = async (productId) => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user) {
+      toast.warning("Please login first");
+      return;
+    }
+    try {
+      // Assuming you have DELETE /wishlist/{user_id}/{product_id}
+      await api.delete(`/wishlist/${user.id}/${productId}`);
+      toast.success("Removed from wishlist");
+      setWishlistItems((prev) => prev.filter((item) => item.id !== productId));
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to remove item from wishlist");
+    }
+  };
+
+  if (loading) return <p className="p-4">Loading wishlist...</p>;
 
   return (
     <div className="p-4 md:p-5">
@@ -20,10 +79,10 @@ const WishlistPage = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {wishlistItems.map((item) => (
             <div
-              key={item._id}
+              key={item.id}
               className="border p-2 rounded-xl shadow-md relative group"
             >
-              <Link to={`/product/${item._id}`}>
+              <Link to={`/product/${item.id}`}>
                 <img
                   src={item.image}
                   alt={`Image of ${item.name}`}
@@ -36,7 +95,7 @@ const WishlistPage = () => {
 
               {/* Add to Cart Button */}
               <button
-                onClick={() => dispatch(addToCart({ ...item, quantity: 1 }))}
+                onClick={() => addToCart(item.id, item.price)}
                 className="mt-2 flex items-center gap-2 text-sm text-white bg-blue-600 px-3 py-1 rounded hover:bg-blue-700"
               >
                 <FaCartPlus /> Add to Cart
@@ -44,11 +103,7 @@ const WishlistPage = () => {
 
               {/* Remove from Wishlist */}
               <button
-                onClick={() => {
-                  if (window.confirm("Remove this item from your wishlist?")) {
-                    dispatch(removeFromWishlist(item._id));
-                  }
-                }}
+                onClick={() => handleRemove(item.id)}
                 className="absolute top-2 right-2 text-red-500 hover:text-red-700"
               >
                 <FaTrash />

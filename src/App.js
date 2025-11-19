@@ -1,10 +1,13 @@
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import {
-  createBrowserRouter,
   RouterProvider,
   Outlet,
   createRoutesFromElements,
   Route,
   ScrollRestoration,
+  createBrowserRouter,
 } from "react-router-dom";
 import Footer from "./components/home/Footer/Footer";
 import FooterBottom from "./components/home/Footer/FooterBottom";
@@ -29,7 +32,7 @@ import Shop from "./pages/Shop/Shop";
 import Login from "./pages/Account/Login";
 import Wishlist from "./pages/Cart/Wishlist";
 import Myprofile from "./pages/Account/Myprofile";
-import ManageAddress from "./pages/Account/ManageAddress"; 
+import ManageAddress from "./pages/Account/ManageAddress";
 import AccountLayout from "./pages/Account/AccountLayout";
 import Myorder from "./pages/Account/Myorder";
 import Review from "./pages/Account/Review";
@@ -37,7 +40,12 @@ import BottomNav from "./components/home/BottomNav/BottomNav";
 import MobileAccount from "./pages/MobileAccountPage/MobileAccount";
 import Logout from "./pages/Account/Logout"; // Import Logout component
 import ProductFilter from "./components/home/Header/ProductFilter";
-import Productt from "./pages/Dummy/Productt";
+import CategoryProducts from "./components/CategoryProducts";
+import SubcategoryProducts from "./components/SubcategoryProducts";
+import { CartProvider } from "./context/CartContext";
+import CheckoutPage from "./pages/checkout/CheckoutPage";
+import OrderSuccess from "./pages/checkout/OrderSuccess";
+import SearchResults from "./pages/SearchResults/SearchResults";
 
 
 
@@ -47,10 +55,9 @@ const Layout = () => {
     <div>
       <Header />
       <HeaderBottom />
-      <Productt/>
       <SpecialCase />
       <ScrollRestoration />
-      
+
       <Outlet />
       <Footer />
       <FooterBottom />
@@ -75,25 +82,30 @@ const router = createBrowserRouter(
         <Route path="/productFilte" element={<ProductFilter />}></Route>
         {/* ==================== Header Navlink End here ===================== */}
         <Route path="/offer" element={<Offer />}></Route>
-        <Route path="/product/:_id" element={<ProductDetails />}></Route>
+        <Route path="/product/:id" element={<ProductDetails />}></Route>
         <Route path="/cart" element={<Cart />}></Route>
-        <Route path="/paymentgateway" element={<Payment />}></Route>
-         <Route path="/profile" element={<Myprofile />} />
+        <Route path="/wishlist" element={<Wishlist />}></Route>
+        <Route path="/paymentgateway" element={<Payment />}></Route> 
+        <Route path="/profile" element={<Myprofile />} />
         <Route path="/addresses" element={<ManageAddress />} />
+        <Route path="/category/:id" element={<CategoryProducts />} />
+        <Route path="/subcategory/:id" element={<SubcategoryProducts />} />
       </Route>
       <Route path="/signup" element={<SignUp />}></Route>
       <Route path="/signin" element={<SignIn />}></Route>
       <Route path="/login" element={<Login />}></Route>
-      <Route path="/wishlist" element={<Wishlist />}></Route>
-       <Route path="/order" element={<Myorder />} />
+      <Route path="/order" element={<Myorder />} />
       <Route path="/mobile-account" element={<MobileAccount />} />
-       <Route path="/review" element={<Review />} />
-       <Route path="/logout" element={<Logout />} />
-       
-        
-     
+      <Route path="/review" element={<Review />} />
+      <Route path="/logout" element={<Logout />} />
+      <Route path="/checkout" element={<CheckoutPage />} />
+      <Route path="/orderSuccess" element={<OrderSuccess />} />
+      <Route path="/search" element={<SearchResults />} />
+      
 
-     <Route path="/account" element={<AccountLayout />}>
+
+
+      <Route path="/account" element={<AccountLayout />}>
         <Route index element={<Myprofile />} />
         <Route path="profile" element={<Myprofile />} />
         <Route path="addresses" element={<ManageAddress />} />
@@ -101,17 +113,21 @@ const router = createBrowserRouter(
         <Route path="review" element={<Review />} />
       </Route>
 
-    </Route>
-    
+    </Route> 
+
   )
 );
 
-function App() {
-  return (
-    <div className="font-bodyFont">
-      <RouterProvider router={router} />
-    </div>
+function App() { 
+  return ( 
+    <CartProvider> 
+      <div className="font-bodyFont"> 
+        <RouterProvider router={router} /> 
+        {/* Toast container required for toasts to display */}
+        <ToastContainer position="top-right" autoClose={2000} />
+      </div>
+    </CartProvider> 
   );
 }
 
-export default App;
+export default App; 

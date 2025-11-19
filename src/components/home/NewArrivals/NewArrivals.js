@@ -19,17 +19,7 @@ const NewArrivals = () => {
  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    axios.get('http://localhost:8000/api/all-product')
-      .then(response => {
-        setUsers(response.data.data); // ✅ yahi sahi hai
-        setLoading(false);
-      })
-      .catch(error => {
-        console.error("Error fetching users:", error);
-        setLoading(false);
-      });
-  }, []);
+  
 
 
   const settings = {

@@ -1,31 +1,44 @@
 import React, { useState } from 'react';
+import { useCart } from '../../context/CartContext'; 
 import { useNavigate } from 'react-router-dom';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import Header from '../../components/home/Header/Header'; 
+import Header from '../../components/home/Header/Header';
 import logonew from '../../assets/images/logonew.jpg';
-import Footer from '../../components/home/Footer/Footer'; // Import Footer
-
+import Footer from '../../components/home/Footer/Footer';
+import api from '../../api'; // ✅ Keep your API integration
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const { refreshToken } = useCart();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    alert(`Logged in with: ${email}`);
-    setEmail('');
-    setPassword('');
+    try {
+      const res = await api.post('/login', { email, password });
+      if (res.data.status) {
+        localStorage.setItem('userToken', res.data.token); 
+        refreshToken();
+        localStorage.setItem('user', JSON.stringify(res.data.user)); 
+        navigate('/');
+      }
+      else {
+        alert(res.data.message);
+      }
+    } catch (err) {
+      alert('Login failed!');
+    }
   };
 
   const handleForgotPassword = () => {
-    alert("Password reset link sent to your email.");
+    alert('Password reset link sent to your email.');
   };
 
   return (
     <>
-      {/*Header added at top */}
+      {/* Header added at top */}
       <Header />
 
       <div className="flex flex-col min-h-screen bg-white">
@@ -36,11 +49,11 @@ const Login = () => {
             <h2 className="text-4xl font-bold">Login</h2>
             <p className="text-lg">
               Get access to your Orders, Wishlist and Recommendations
-            <img
-              src={logonew}
-              alt="Login illustration"
-              className="w-72 mt-4"
-            />
+              <img
+                src={logonew}
+                alt="Login illustration"
+                className="w-72 mt-4"
+              />
             </p>
           </div>
 
@@ -117,7 +130,9 @@ const Login = () => {
           </div>
         </div>
       </div>
-      <Footer/>
+
+      {/* Footer at bottom */}
+      <Footer />
     </>
   );
 };

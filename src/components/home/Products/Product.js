@@ -39,8 +39,8 @@ const Product = (props) => {
         <div className="w-full h-32 absolute -bottom-[130px] group-hover:bottom-0 duration-700 flex items-center justify-center">
           <ul className="flex items-center justify-center gap-4 font-titleFont">
             <li
-             className="w-12 h-12 flex items-center justify-center rounded-full bg-white text-[#9F2B68] hover:bg-[#9F2B68] hover:text-white shadow-md hover:shadow-lg duration-300 cursor-pointer text-2xl"
-title="Compare">
+              className="w-12 h-12 flex items-center justify-center rounded-full bg-white text-[#9F2B68] hover:bg-[#9F2B68] hover:text-white shadow-md hover:shadow-lg duration-300 cursor-pointer text-2xl"
+              title="Compare">
 
               <GiReturnArrow />
             </li>
@@ -71,23 +71,23 @@ title="Compare">
               <MdOutlineLabelImportant />
             </li>
             <li
-  onClick={() =>
-    dispatch(
-      addToWishlist({
-        _id: props._id,
-        name: props.productName,
-        image: props.img,
-        badge: props.badge,
-        price: props.price,
-        colors: props.color,
-      })
-    )
-  }
-  className="w-12 h-12 flex items-center justify-center rounded-full bg-white text-[#9F2B68] hover:bg-[#9F2B68] hover:text-white shadow-md hover:shadow-lg duration-300 cursor-pointer text-2xl"
-  title="Add to Wishlist"
->
-  <BsSuitHeartFill />
-</li>
+              onClick={() =>
+                dispatch(
+                  addToWishlist({
+                    _id: props._id,
+                    name: props.productName,
+                    image: props.img,
+                    badge: props.badge,
+                    price: props.price,
+                    colors: props.color,
+                  })
+                )
+              }
+              className="w-12 h-12 flex items-center justify-center rounded-full bg-white text-[#9F2B68] hover:bg-[#9F2B68] hover:text-white shadow-md hover:shadow-lg duration-300 cursor-pointer text-2xl"
+              title="Add to Wishlist"
+            >
+              <BsSuitHeartFill />
+            </li>
 
           </ul>
         </div>
