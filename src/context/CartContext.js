@@ -87,18 +87,21 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  const checkout = async (shippingAddress) => {
+  const checkout = async (shippingAddress, paymentMethod) => {
     try {
       const res = await api.post(
         "/cart-checkout",
-        { shipping_address: shippingAddress },
+        {
+          shipping_address: shippingAddress,
+          payment_method: paymentMethod,
+        },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
       if (res.data.status) {
         toast.success("✅ Order placed successfully!");
-        fetchCart(); // Clear the cart context
-        return true; // Let CheckoutPage know it's successful
+        fetchCart();
+        return true;
       } else {
         alert("❌ " + (res.data.message || "Something went wrong"));
         return false;
@@ -108,7 +111,8 @@ export const CartProvider = ({ children }) => {
       alert("❌ Checkout failed!");
       return false;
     }
-  };
+  }; 
+
 
 
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);

@@ -17,7 +17,7 @@ const CategoryBar = () => {
     };
     fetchCategories();
   }, []);
-
+ 
   return (
     <div className="relative w-full bg-white border-b py-4 px-2 overflow-x-auto whitespace-nowrap flex gap-4 scrollbar-hide z-1 md:justify-center md:flex-wrap md:overflow-visible">
       {categories.map((cat) => (

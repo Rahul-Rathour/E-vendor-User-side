@@ -7,6 +7,7 @@ const CheckoutPage = () => {
   const navigate = useNavigate();
   const { checkout } = useCart();
   const [shippingAddress, setShippingAddress] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("COD");
 
   if (!state) return <p className="text-center mt-10">No checkout data found.</p>;
 
@@ -19,8 +20,21 @@ const CheckoutPage = () => {
       return;
     }
 
-    const success = await checkout(shippingAddress);
-    if (success) navigate("/orderSuccess");
+    // COD Flow
+    if (paymentMethod === "COD") {
+      const success = await checkout(shippingAddress, "COD");
+      if (success) navigate("/orderSuccess");
+      return;
+    }
+
+    // Razorpay Flow → redirect to razorpay page
+    navigate("/razorpay", {
+      state: {
+        finalTotal,
+        shippingAddress,
+        paymentMethod: "Online",
+      },
+    });
   };
 
   return (
@@ -53,7 +67,7 @@ const CheckoutPage = () => {
         <p>₹{finalTotal.toLocaleString()}</p>
       </div>
 
-      {/* Shipping Address Input */}
+      {/* Shipping Address */}
       <div className="mt-6">
         <label className="block text-lg font-medium mb-2">
           Shipping Address
@@ -65,6 +79,35 @@ const CheckoutPage = () => {
           value={shippingAddress}
           onChange={(e) => setShippingAddress(e.target.value)}
         />
+      </div>
+
+      {/* Payment Method */}
+      <div className="mt-6">
+        <p className="text-lg font-medium mb-2">Payment Method</p>
+
+        <div className="flex flex-col gap-2">
+          <label className="flex items-center gap-2">
+            <input
+              type="radio"
+              name="payment"
+              value="COD"
+              checked={paymentMethod === "COD"}
+              onChange={() => setPaymentMethod("COD")}
+            />
+            Cash on Delivery (COD)
+          </label>
+
+          <label className="flex items-center gap-2">
+            <input
+              type="radio"
+              name="payment"
+              value="Online"
+              checked={paymentMethod === "Online"}
+              onChange={() => setPaymentMethod("Online")}
+            />
+            Online Payment (Razorpay)
+          </label>
+        </div>
       </div>
 
       {/* Confirm Button */}

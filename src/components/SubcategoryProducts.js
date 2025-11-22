@@ -80,8 +80,8 @@ const SubcategoryProducts = () => {
                 <div
                   onClick={() => handleAddToWishlist(prod.id)}
                   className={`flex items-center justify-center w-10 h-10 rounded-full bg-white text-xl shadow-md hover:shadow-lg cursor-pointer transition-all duration-300 ${activeWishlist.includes(prod.id)
-                    ? "text-[#9F2B68]"
-                    : "text-gray-400 hover:text-[#9F2B68]"
+                    ? "text-brandColor"
+                    : "text-gray-400 hover:text-brandColor"
                     }`}
                 >
                   {activeWishlist.includes(prod.id) ? (
@@ -95,7 +95,7 @@ const SubcategoryProducts = () => {
               {/* Image Section */}
               <div className="relative overflow-hidden">
                 {prod.is_new && (
-                  <span className="absolute top-4 left-4 bg-[#9F2B68] text-white text-sm px-3 py-1 rounded-md font-medium">
+                  <span className="absolute top-4 left-4 bg-brandColor text-white text-sm px-3 py-1 rounded-md font-medium">
                     New
                   </span>
                 )}
@@ -112,16 +112,16 @@ const SubcategoryProducts = () => {
 
                 {/* Hover Icons */}
                 <div className="absolute bottom-[-100px] group-hover:bottom-6 left-1/2 transform -translate-x-1/2 flex items-center gap-4 transition-all duration-700">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white text-[#9F2B68] hover:bg-[#9F2B68] hover:text-white text-xl shadow-md hover:shadow-lg cursor-pointer">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white text-brandColor hover:bg-brandColor hover:text-white text-xl shadow-md hover:shadow-lg cursor-pointer">
                     <GiReturnArrow />
                   </div>
                   <div
                     onClick={() => addToCart(prod.id, prod.price)}
-                    className="flex items-center justify-center w-10 h-10 rounded-full bg-white text-[#9F2B68] hover:bg-[#9F2B68] hover:text-white text-xl shadow-md hover:shadow-lg cursor-pointer"
+                    className="flex items-center justify-center w-10 h-10 rounded-full bg-white text-brandColor hover:bg-brandColor hover:text-white text-xl shadow-md hover:shadow-lg cursor-pointer"
                   >
                     <FaShoppingCart />
                   </div>
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white text-[#9F2B68] hover:bg-[#9F2B68] hover:text-white text-xl shadow-md hover:shadow-lg cursor-pointer">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white text-brandColor hover:bg-brandColor hover:text-white text-xl shadow-md hover:shadow-lg cursor-pointer">
                     <MdOutlineLabelImportant />
                   </div>
 

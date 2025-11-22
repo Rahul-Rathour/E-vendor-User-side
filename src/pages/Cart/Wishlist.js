@@ -2,9 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useCart } from "../../context/CartContext";
 import { Link, useNavigate } from "react-router-dom";
-import { FaTrash, FaCartPlus } from "react-icons/fa";
+import { FaTrash, FaCartPlus, FaShoppingCart } from "react-icons/fa";
 import api from "../../api"; // ✅ your axios instance
 import { toast } from "react-toastify";
+import { MdOutlineLabelImportant } from "react-icons/md";
+import { GiReturnArrow } from "react-icons/gi";
 
 const WishlistPage = () => {
   const navigate = useNavigate();
@@ -20,7 +22,7 @@ const WishlistPage = () => {
       if (!user) {
         navigate('/login');
         toast.warning("Please login to see your wishlist");
-        setLoading(false); 
+        setLoading(false);
         return;
       }
 
@@ -70,50 +72,78 @@ const WishlistPage = () => {
   if (loading) return <p className="p-4">Loading wishlist...</p>;
 
   return (
-    <div className="p-4 md:p-5">
-      <h1 className="text-2xl font-bold mb-4">My Wishlist</h1>
+    <div className="max-w-container mx-auto px-4 py-8">
+      <h1 className="text-2xl font-bold mb-6 text-primeColor text-center md:text-left">
+        My Wishlist
+      </h1>
 
       {wishlistItems.length === 0 ? (
-        <p>Your wishlist is empty.</p>
+        <p className="text-center text-gray-500 mt-10">Your wishlist is empty.</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {wishlistItems.map((item) => (
             <div
               key={item.id}
-              className="border p-2 rounded-xl shadow-md relative group"
+              className="w-full relative group bg-white border rounded-md overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300"
             >
-              <Link to={`/product/${item.id}`}>
+              {/* ❤️ Remove from wishlist */}
+              <div className="absolute top-4 right-4 z-10">
+                <div
+                  onClick={() => handleRemove(item.id)}
+                  className="flex items-center justify-center w-10 h-10 rounded-full bg-white text-xl shadow-md hover:shadow-lg cursor-pointer transition-all duration-300 text-red-500 hover:text-red-600"
+                >
+                  <FaTrash />
+                </div>
+              </div>
+
+              {/* Image Section */}
+              <div className="relative overflow-hidden">
                 <img
                   src={item.image}
-                  alt={`Image of ${item.name}`}
-                  className="w-full h-48 object-contain"
+                  alt={item.name}
+                  onClick={() => navigate(`/product/${item.id}`)}
+                  className="w-full h-64 object-contain p-6 transition-transform duration-700 group-hover:scale-105"
                 />
-                <h2 className="text-lg font-semibold mt-2">{item.name}</h2>
-              </Link>
 
-              <p className="text-green-600 font-bold mt-1">₹{item.price}</p>
+                {/* Hover Icons */}
+                <div className="absolute bottom-[-100px] group-hover:bottom-6 left-1/2 transform -translate-x-1/2 flex items-center gap-4 transition-all duration-700">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white text-[#9F2B68] hover:bg-[#9F2B68] hover:text-white text-xl shadow-md hover:shadow-lg cursor-pointer">
+                    <GiReturnArrow />
+                  </div>
+                  <div
+                    onClick={() => addToCart(item.id, item.price)}
+                    className="flex items-center justify-center w-10 h-10 rounded-full bg-white text-[#9F2B68] hover:bg-[#9F2B68] hover:text-white text-xl shadow-md hover:shadow-lg cursor-pointer"
+                  >
+                    <FaShoppingCart />
+                  </div>
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white text-[#9F2B68] hover:bg-[#9F2B68] hover:text-white text-xl shadow-md hover:shadow-lg cursor-pointer">
+                    <MdOutlineLabelImportant />
+                  </div>
 
-              {/* Add to Cart Button */}
-              <button
-                onClick={() => addToCart(item.id, item.price)}
-                className="mt-2 flex items-center gap-2 text-sm text-white bg-blue-600 px-3 py-1 rounded hover:bg-blue-700"
-              >
-                <FaCartPlus /> Add to Cart
-              </button>
+                </div>
+              </div>
 
-              {/* Remove from Wishlist */}
-              <button
-                onClick={() => handleRemove(item.id)}
-                className="absolute top-2 right-2 text-red-500 hover:text-red-700"
-              >
-                <FaTrash />
-              </button>
+              {/* Info section */}
+              <div className="px-5 py-4 border-t flex flex-col gap-1">
+                <div className="flex items-center justify-between font-titleFont">
+                  <h3 className="text-lg font-bold text-primeColor truncate">
+                    {item.name}
+                  </h3>
+                  <p className="text-[#767676] text-[15px] font-medium">
+                    ₹ {item.price}
+                  </p>
+                </div>
+                <p className="text-[#767676] text-[14px]">
+                  {item.color || "Mixed"}
+                </p>
+              </div>
             </div>
           ))}
         </div>
       )}
     </div>
   );
+
 };
 
 export default WishlistPage;

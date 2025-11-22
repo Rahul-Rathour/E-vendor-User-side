@@ -31,7 +31,7 @@ const SpecialCase = () => {
           <p className="text-xs font-semibold font-titleFont">Buy Now</p>
           {cartCount > 0 && (
             <p className="absolute top-1 right-2 bg-primeColor text-white text-xs w-4 h-4 rounded-full flex items-center justify-center font-semibold">
-              {cartCount}
+              {cartCount} 
             </p>
           )}
         </div>

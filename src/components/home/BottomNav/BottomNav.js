@@ -5,7 +5,7 @@ import { BsGrid } from "react-icons/bs";
 import { FaUser } from "react-icons/fa";
 import { FaShoppingCart } from "react-icons/fa";
 import { Link } from "react-router-dom";
-
+ 
 const BottomNav = () => {
   return (
     <div className="fixed bottom-0 w-full bg-white shadow-inner border-t border-gray-200 z-50 block md:hidden">

@@ -7,7 +7,8 @@ import {
   FaHeadset,
   FaUserCircle,
 } from "react-icons/fa";
-import api from "../../api"; // ✅ your axios instance
+import api from "../../api";
+import HeaderCopy from "../../components/home/Header-copy/HeaderCopy";
 
 const MobileAccount = () => {
   const navigate = useNavigate();
@@ -70,6 +71,8 @@ const MobileAccount = () => {
   }
 
   return (
+    <>
+    <HeaderCopy/>
     <div className="block p-4 bg-gray-50 min-h-screen space-y-6">
       {/* Profile Header */}
       <div className="bg-white rounded-xl p-4 shadow-md flex items-center gap-4">
@@ -183,6 +186,7 @@ const MobileAccount = () => {
         </button>
       </div>
     </div>
+    </>
   );
 };
 

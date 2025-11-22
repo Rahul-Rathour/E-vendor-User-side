@@ -9,7 +9,7 @@ import { GiReturnArrow } from "react-icons/gi";
 import { toast } from "react-toastify";
 
 const CategoryProducts = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate(); 
   const { id } = useParams();
   const { addToCart } = useCart();
   const [products, setProducts] = useState([]);
@@ -76,8 +76,8 @@ const CategoryProducts = () => {
                 <div
                   onClick={() => handleAddToWishlist(product.id)}
                   className={`flex items-center justify-center w-10 h-10 rounded-full bg-white text-xl shadow-md hover:shadow-lg cursor-pointer transition-all duration-300 ${activeWishlist.includes(product.id)
-                    ? "text-[#9F2B68]"
-                    : "text-gray-400 hover:text-[#9F2B68]"
+                    ? "text-brandColor"
+                    : "text-gray-400 hover:text-brandColor"
                     }`}
                 >
                   {activeWishlist.includes(product.id) ? (
@@ -90,7 +90,7 @@ const CategoryProducts = () => {
               {/* Image section */}
               <div className="relative overflow-hidden">
                 {product.is_new && (
-                  <span className="absolute top-4 left-4 bg-[#9F2B68] text-white text-sm px-3 py-1 rounded-md font-medium">
+                  <span className="absolute top-4 left-4 bg-brandColor text-white text-sm px-3 py-1 rounded-md font-medium">
                     New
                   </span>
                 )}
@@ -107,16 +107,16 @@ const CategoryProducts = () => {
 
                 {/* Hover Icons */}
                 <div className="absolute bottom-[-100px] group-hover:bottom-6 left-1/2 transform -translate-x-1/2 flex items-center gap-4 transition-all duration-700">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white text-[#9F2B68] hover:bg-[#9F2B68] hover:text-white text-xl shadow-md hover:shadow-lg cursor-pointer">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white text-brandColor hover:bg-brandColor hover:text-white text-xl shadow-md hover:shadow-lg cursor-pointer">
                     <GiReturnArrow />
                   </div>
                   <div
                     onClick={() => addToCart(product.id, product.price)}
-                    className="flex items-center justify-center w-10 h-10 rounded-full bg-white text-[#9F2B68] hover:bg-[#9F2B68] hover:text-white text-xl shadow-md hover:shadow-lg cursor-pointer"
+                    className="flex items-center justify-center w-10 h-10 rounded-full bg-white text-brandColor hover:bg-brandColor hover:text-white text-xl shadow-md hover:shadow-lg cursor-pointer"
                   >
                     <FaShoppingCart />
                   </div>
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white text-[#9F2B68] hover:bg-[#9F2B68] hover:text-white text-xl shadow-md hover:shadow-lg cursor-pointer">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white text-brandColor hover:bg-brandColor hover:text-white text-xl shadow-md hover:shadow-lg cursor-pointer">
                     <MdOutlineLabelImportant />
                   </div>
 
@@ -142,7 +142,7 @@ const CategoryProducts = () => {
         </div>
       )}
     </div>
-  );
+  ); 
 };
 
 export default CategoryProducts;

@@ -114,46 +114,77 @@ const Header = () => {
   return (
     <div className="w-full bg-white sticky top-0 z-50 border-b border-gray-200">
       {/* Mobile header */}
-      <div className="md:hidden w-full h-16 flex items-center justify-between px-4 shadow-sm relative">
-        <Link to="/">
-          <img src={logo} alt="logo" className="h-10 object-contain" />
-        </Link>
+      {/* Mobile header */}
+      <div className="md:hidden w-full bg-white sticky top-0 z-50 border-b border-gray-200">
+        <div className="w-full h-16 flex items-center justify-between px-4">
+          {/* Logo */}
+          <Link to="/">
+            <img src={logo} alt="logo" className="h-10 object-contain" />
+          </Link>
 
-        <FaSearch
-          onClick={() => setIsSearchOpen((prev) => !prev)}
-          className="w-5 h-5 text-gray-600 cursor-pointer"
-        />
-
-        {isSearchOpen && (
-          <div className="absolute top-full left-0 w-full bg-white p-2 shadow-lg z-50">
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={handleSearchChange}
-                placeholder="Search products..."
-                className="flex-1 p-2 border border-gray-300 rounded-md outline-none"
-              />
-              <button
-                onClick={() => {
-                  if (searchQuery.trim()) {
-                    navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
-                    setIsSearchOpen(false);
-                  }
-                }}
-                className="px-4 py-2 bg-primeColor text-white rounded-md hover:bg-black transition-all duration-200"
-              >
-                Search
-              </button>
-            </div>
-
-            {searchLoading && (
-              <div className="p-2 text-sm text-gray-500">Searching...</div>
+          {/* Cart Icon */}
+          <Link to="/cart" className="relative">
+            <FaShoppingCart className="w-6 h-6 text-gray-700" />
+            {cartCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1.5 rounded-full">
+                {cartCount}
+              </span>
             )}
+          </Link>
 
-            {showResults && filteredProducts.length > 0 && (
-              <div className="bg-white border mt-1 rounded shadow-md max-h-64 overflow-y-auto">
-                {filteredProducts.map((item) => (
+          {/* Login / Logout */}
+          {!isLoggedIn ? (
+            <button onClick={() => navigate("/login")}>
+              <FaUser className="w-6 h-6 text-gray-700" />
+            </button>
+          ) : (
+            <button
+              onClick={handleLogout}
+              className="text-xs bg-gray-100 px-2 py-1 rounded hover:bg-gray-200"
+            >
+              Logout
+            </button>
+          )}
+
+          {/* Menu Icon */}
+          <HiMenuAlt2
+            onClick={() => setSidenav(true)}
+            className="w-7 h-7 text-gray-700 cursor-pointer"
+          />
+        </div>
+
+        {/* Always visible Search Bar like Flipkart */}
+        <div className="px-4 pb-3">
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={handleSearchChange}
+              placeholder="Search for products, brands and more"
+              className="flex-1 p-2 border border-gray-300 rounded-md bg-blue-50"
+            />
+
+            <button
+              onClick={() => {
+                if (searchQuery.trim()) {
+                  navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+                }
+              }}
+              className="px-4 py-2 bg-primeColor text-white rounded-md hover:bg-black transition-all duration-200"
+            >
+              Search
+            </button>
+          </div>
+
+          {/* Mobile search results */}
+          {showResults && (
+            <div className="bg-white border mt-1 rounded shadow-md max-h-64 overflow-y-auto">
+              {searchLoading && (
+                <div className="p-2 text-sm text-gray-500">Searching...</div>
+              )}
+
+              {!searchLoading &&
+                filteredProducts.map((item) => (
                   <div
                     key={item.id}
                     className="flex items-center gap-2 p-2 border-b cursor-pointer hover:bg-gray-100"
@@ -174,39 +205,109 @@ const Header = () => {
                     </div>
                   </div>
                 ))}
-              </div>
-            )}
 
-            {showResults && !searchLoading && filteredProducts.length === 0 && (
-              <div className="p-2 text-sm text-gray-500">No products found.</div>
-            )}
-          </div>
-        )}
-
-
-        <Link to="/cart" className="relative">
-          <FaShoppingCart className="w-5 h-5 text-gray-600" />
-          {cartCount > 0 && (
-            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1.5 rounded-full">
-              {cartCount}
-            </span>
+              {!searchLoading && filteredProducts.length === 0 && (
+                <div className="p-2 text-sm text-gray-500">No products found.</div>
+              )}
+            </div>
           )}
-        </Link>
-
-        {!isLoggedIn ? (
-          <button onClick={() => navigate("/login")} className="focus:outline-none" aria-label="Login">
-            <FaUser className="w-5 h-5 text-gray-600" />
-          </button>
-        ) : (
-          <button onClick={handleLogout} className="text-sm bg-gray-100 px-2 py-1 rounded hover:bg-gray-200">
-            Logout
-          </button>
-        )}
-
-        <HiMenuAlt2 onClick={() => setSidenav(true)} className="w-6 h-6 text-gray-600 cursor-pointer" />
+        </div>
       </div>
 
+
       {/* Mobile menu omitted for brevity, keep your existing code */}
+      {/* Mobile Side Menu */}
+      {sidenav && (
+        <motion.div
+          className="fixed inset-0 z-[999] bg-black/40"
+          onClick={() => setSidenav(false)}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <motion.div
+            onClick={(e) => e.stopPropagation()}
+            initial={{ x: "-100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "-100%" }}
+            transition={{ duration: 0.35, ease: "easeOut" }}
+            className="w-72 h-full bg-white p-4 shadow-lg fixed left-0 top-0"
+          >
+            {/* Header */}
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-lg font-semibold">Menu</h2>
+              <MdClose
+                onClick={() => setSidenav(false)}
+                className="w-6 h-6 text-gray-700 cursor-pointer"
+              />
+            </div>
+
+            {/* Menu Items */}
+            <div className="flex flex-col gap-4">
+
+              {!isLoggedIn ? (
+                <button
+                  onClick={() => {
+                    navigate("/login");
+                    setSidenav(false);
+                  }}
+                  className="flex items-center gap-3 p-2 border rounded hover:bg-gray-100"
+                >
+                  <FaUser className="text-gray-700" />
+                  <span>Login</span>
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    setSidenav(false);
+                  }}
+                  className="flex items-center gap-3 p-2 border rounded hover:bg-gray-100"
+                >
+                  <FaUser className="text-gray-700" />
+                  <span>Logout</span>
+                </button>
+              )}
+
+              <button
+                onClick={() => {
+                  navigate("/cart");
+                  setSidenav(false);
+                }}
+                className="flex items-center gap-3 p-2 border rounded hover:bg-gray-100"
+              >
+                <FaShoppingCart className="text-gray-700" />
+                <span>Cart</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  navigate("/wishlist");
+                  setSidenav(false);
+                }}
+                className="flex items-center gap-3 p-2 border rounded hover:bg-gray-100"
+              >
+                <FaHeart className="text-gray-700" />
+                <span>Wishlist</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  navigate("/profile");
+                  setSidenav(false);
+                }}
+                className="flex items-center gap-3 p-2 border rounded hover:bg-gray-100"
+              >
+                <FaUser className="text-gray-700" />
+                <span>My Profile</span>
+              </button>
+
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+
+
 
       {/* Desktop header */}
       <div className="hidden md:flex items-center justify-between px-8 py-4 max-w-screen-xl mx-auto">

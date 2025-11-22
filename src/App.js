@@ -38,7 +38,7 @@ import Myorder from "./pages/Account/Myorder";
 import Review from "./pages/Account/Review";
 import BottomNav from "./components/home/BottomNav/BottomNav";
 import MobileAccount from "./pages/MobileAccountPage/MobileAccount";
-import Logout from "./pages/Account/Logout"; // Import Logout component
+import Logout from "./pages/Account/Logout";
 import ProductFilter from "./components/home/Header/ProductFilter";
 import CategoryProducts from "./components/CategoryProducts";
 import SubcategoryProducts from "./components/SubcategoryProducts";
@@ -46,6 +46,9 @@ import { CartProvider } from "./context/CartContext";
 import CheckoutPage from "./pages/checkout/CheckoutPage";
 import OrderSuccess from "./pages/checkout/OrderSuccess";
 import SearchResults from "./pages/SearchResults/SearchResults";
+import RazorpayPayment from "./pages/RazorPayPage/RazorpayPayment";
+import OrderDetails from "./pages/OrderDetails/OrderDetails";
+import PaymentFailed from "./pages/checkout/PaymentFailed";
 
 
 
@@ -85,23 +88,27 @@ const router = createBrowserRouter(
         <Route path="/product/:id" element={<ProductDetails />}></Route>
         <Route path="/cart" element={<Cart />}></Route>
         <Route path="/wishlist" element={<Wishlist />}></Route>
-        <Route path="/paymentgateway" element={<Payment />}></Route> 
+        <Route path="/paymentgateway" element={<Payment />}></Route>
         <Route path="/profile" element={<Myprofile />} />
         <Route path="/addresses" element={<ManageAddress />} />
         <Route path="/category/:id" element={<CategoryProducts />} />
         <Route path="/subcategory/:id" element={<SubcategoryProducts />} />
+        <Route path="/search" element={<SearchResults />} />
       </Route>
       <Route path="/signup" element={<SignUp />}></Route>
       <Route path="/signin" element={<SignIn />}></Route>
       <Route path="/login" element={<Login />}></Route>
       <Route path="/order" element={<Myorder />} />
+      <Route path="/order-details/:id" element={<OrderDetails />} />
       <Route path="/mobile-account" element={<MobileAccount />} />
       <Route path="/review" element={<Review />} />
       <Route path="/logout" element={<Logout />} />
       <Route path="/checkout" element={<CheckoutPage />} />
       <Route path="/orderSuccess" element={<OrderSuccess />} />
-      <Route path="/search" element={<SearchResults />} />
-      
+      <Route path="/paymentFailed" element={<PaymentFailed/>}/>
+      <Route path="/razorpay" element={<RazorpayPayment />} />
+
+
 
 
 
@@ -113,20 +120,20 @@ const router = createBrowserRouter(
         <Route path="review" element={<Review />} />
       </Route>
 
-    </Route> 
+    </Route>
 
   )
 );
 
-function App() { 
-  return ( 
-    <CartProvider> 
-      <div className="font-bodyFont"> 
-        <RouterProvider router={router} /> 
+function App() {
+  return (
+    <CartProvider>
+      <div className="font-bodyFont">
+        <RouterProvider router={router} />
         {/* Toast container required for toasts to display */}
         <ToastContainer position="top-right" autoClose={2000} />
       </div>
-    </CartProvider> 
+    </CartProvider>
   );
 }
 

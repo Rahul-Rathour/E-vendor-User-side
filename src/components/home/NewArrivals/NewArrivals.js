@@ -58,7 +58,7 @@ const NewArrivals = () => {
   };
   return (
     <div className="w-full pb-16">
-      <Heading heading="New Arrivals" />
+      <Heading heading="New Arrivalss" />
       <Slider {...settings}>
 {users.map((user, index) => (
   <div className="px-2" key={user.id || index}>
