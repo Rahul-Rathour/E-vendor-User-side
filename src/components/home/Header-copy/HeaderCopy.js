@@ -5,8 +5,8 @@ import { HiMenuAlt2 } from "react-icons/hi";
 import { motion } from "framer-motion";
 import { logo } from "../../../assets/images";
 import { navBarList } from "../../../constants";
-import { FiChevronDown } from "react-icons/fi";
-import { FaSearch, FaUser, FaShoppingCart, FaHeart } from "react-icons/fa";
+import { FiChevronDown, FiGrid } from "react-icons/fi";
+import { FaSearch, FaUser, FaShoppingCart, FaHeart, FaBoxOpen } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { useCart } from "../../../context/CartContext";
 import api from "../../../api"; // ensure this exists and uses baseURL
@@ -19,6 +19,7 @@ const HeaderCopy = () => {
     const [filteredProducts, setFilteredProducts] = useState([]);
     const [searchLoading, setSearchLoading] = useState(false);
     const [showResults, setShowResults] = useState(false);
+    const [listening, setListening] = useState(false);
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -29,6 +30,7 @@ const HeaderCopy = () => {
 
     // debounce timer ref
     const debounceRef = useRef(null);
+    const recognitionRef = useRef(null);
 
     // cancel token to abort previous request (optional improvement)
     const abortControllerRef = useRef(null);
@@ -38,6 +40,35 @@ const HeaderCopy = () => {
         setShowResults(false);
         setIsSearchOpen(false);
     }, [location.pathname]);
+
+
+    const startVoiceSearch = () => {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            alert("Your browser does not support Voice Search");
+            return;
+        }
+
+
+        recognitionRef.current = new SpeechRecognition();
+        recognitionRef.current.lang = "en-US";
+        recognitionRef.current.interimResults = false;
+
+
+        recognitionRef.current.onstart = () => setListening(true);
+        recognitionRef.current.onend = () => setListening(false);
+
+
+        recognitionRef.current.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            setSearchQuery(transcript);
+            performSearch(transcript);
+            setShowResults(true);
+        };
+
+
+        recognitionRef.current.start();
+    };
 
     const handleLogout = () => {
         navigate("/logout");
@@ -134,6 +165,20 @@ const HeaderCopy = () => {
                                 placeholder="Search products..."
                                 className="flex-1 p-2 border border-gray-300 rounded-md outline-none"
                             />
+                            {/* Voice Button */}
+                            <button
+                                onClick={startVoiceSearch}
+                                className="text-gray-500 hover:text-blue-600"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="currentColor"
+                                    viewBox="0 0 24 24"
+                                    className="w-5 h-5"
+                                >
+                                    <path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 1 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 14 0h-2zm-5 9a1 1 0 0 0 1-1v-2a1 1 0 1 0-2 0v2a1 1 0 0 0 1 1z" />
+                                </svg>
+                            </button>
                             <button
                                 onClick={() => {
                                     if (searchQuery.trim()) {
@@ -272,6 +317,17 @@ const HeaderCopy = () => {
 
                             <button
                                 onClick={() => {
+                                    navigate("/categories");
+                                    setSidenav(false);
+                                }}
+                                className="flex items-center gap-3 p-2 border rounded hover:bg-gray-100"
+                            >
+                                <FiGrid className="text-gray-700" />
+                                <span>All Categories</span>
+                            </button>
+
+                            <button
+                                onClick={() => {
                                     navigate("/wishlist");
                                     setSidenav(false);
                                 }}
@@ -279,6 +335,17 @@ const HeaderCopy = () => {
                             >
                                 <FaHeart className="text-gray-700" />
                                 <span>Wishlist</span>
+                            </button>
+
+                            <button
+                                onClick={() => {
+                                    navigate("/order");
+                                    setSidenav(false);
+                                }}
+                                className="flex items-center gap-3 p-2 border rounded hover:bg-gray-100"
+                            >
+                                <FaBoxOpen className="text-gray-700" />
+                                <span>My Orders</span>
                             </button>
 
                             <button
@@ -319,7 +386,20 @@ const HeaderCopy = () => {
                         />
                         <FaSearch className="absolute left-3 top-3 text-gray-500" />
                     </div>
-
+                    {/* Voice Button */}
+                    <button
+                        onClick={startVoiceSearch}
+                        className="text-gray-500 hover:text-blue-600"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="currentColor"
+                            viewBox="0 0 24 24"
+                            className="w-5 h-5"
+                        >
+                            <path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 1 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 14 0h-2zm-5 9a1 1 0 0 0 1-1v-2a1 1 0 1 0-2 0v2a1 1 0 0 0 1 1z" />
+                        </svg>
+                    </button>
                     <button
                         onClick={() => {
                             if (searchQuery.trim()) {

@@ -18,7 +18,7 @@ const BottomNav = () => {
           <FiPlay size={22} />
           <span>Play</span>
         </Link>
-        <Link to="/shop" className="flex flex-col items-center justify-center">
+        <Link to="/categories" className="flex flex-col items-center justify-center">
           <BsGrid size={22} />
           <span>Categories</span>
         </Link>

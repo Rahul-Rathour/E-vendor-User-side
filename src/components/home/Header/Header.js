@@ -5,8 +5,8 @@ import { HiMenuAlt2 } from "react-icons/hi";
 import { motion } from "framer-motion";
 import { logo } from "../../../assets/images";
 import { navBarList } from "../../../constants";
-import { FiChevronDown } from "react-icons/fi";
-import { FaSearch, FaUser, FaShoppingCart, FaHeart } from "react-icons/fa";
+import { FiChevronDown, FiGrid } from "react-icons/fi";
+import { FaSearch, FaUser, FaShoppingCart, FaHeart, FaBoxOpen } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { useCart } from "../../../context/CartContext";
 import api from "../../../api"; // ensure this exists and uses baseURL
@@ -19,6 +19,7 @@ const Header = () => {
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [searchLoading, setSearchLoading] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const [listening, setListening] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -32,12 +33,44 @@ const Header = () => {
 
   // cancel token to abort previous request (optional improvement)
   const abortControllerRef = useRef(null);
+  const recognitionRef = useRef(null);
 
   useEffect(() => {
     // close search dropdown on route change
     setShowResults(false);
     setIsSearchOpen(false);
   }, [location.pathname]);
+
+  const startVoiceSearch = () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Your browser does not support Voice Search");
+      return;
+    }
+
+
+    recognitionRef.current = new SpeechRecognition();
+    recognitionRef.current.lang = "en-US";
+    recognitionRef.current.interimResults = false;
+
+
+    recognitionRef.current.onstart = () => setListening(true);
+    recognitionRef.current.onend = () => setListening(false);
+
+
+    recognitionRef.current.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      setSearchQuery(transcript);
+      performSearch(transcript);
+      setShowResults(true);
+    };
+
+
+    recognitionRef.current.start();
+  };
+
+
+
 
   const handleLogout = () => {
     navigate("/logout");
@@ -114,7 +147,14 @@ const Header = () => {
   return (
     <div className="w-full bg-white sticky top-0 z-50 border-b border-gray-200">
       {/* Mobile header */}
-      {/* Mobile header */}
+      {/* Voice listening popup */}
+      {listening && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999]">
+          <div className="bg-white px-6 py-4 rounded-xl shadow-lg text-center animate-pulse">
+            <p className="text-lg font-semibold">🎤 Listening...</p>
+          </div>
+        </div>
+      )}
       <div className="md:hidden w-full bg-white sticky top-0 z-50 border-b border-gray-200">
         <div className="w-full h-16 flex items-center justify-between px-4">
           {/* Logo */}
@@ -155,7 +195,7 @@ const Header = () => {
 
         {/* Always visible Search Bar like Flipkart */}
         <div className="px-4 pb-3">
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
             <input
               type="text"
               value={searchQuery}
@@ -164,17 +204,33 @@ const Header = () => {
               className="flex-1 p-2 border border-gray-300 rounded-md bg-blue-50"
             />
 
+            {/* Voice Button */}
+            <button
+              onClick={startVoiceSearch}
+              className="text-gray-500 hover:text-blue-600"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+                className="w-5 h-5"
+              >
+                <path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 1 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 14 0h-2zm-5 9a1 1 0 0 0 1-1v-2a1 1 0 1 0-2 0v2a1 1 0 0 0 1 1z" />
+              </svg>
+            </button>
+
             <button
               onClick={() => {
                 if (searchQuery.trim()) {
                   navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
                 }
               }}
-              className="px-4 py-2 bg-primeColor text-white rounded-md hover:bg-black transition-all duration-200"
+              className="px-3 py-1 text-sm bg-primeColor text-white rounded-md hover:bg-black transition-all duration-200"
             >
               Search
             </button>
           </div>
+
 
           {/* Mobile search results */}
           {showResults && (
@@ -282,6 +338,17 @@ const Header = () => {
 
               <button
                 onClick={() => {
+                  navigate("/categories");
+                  setSidenav(false);
+                }}
+                className="flex items-center gap-3 p-2 border rounded hover:bg-gray-100"
+              >
+                <FiGrid className="text-gray-700" />
+                <span>All Category</span>
+              </button>
+
+              <button
+                onClick={() => {
                   navigate("/wishlist");
                   setSidenav(false);
                 }}
@@ -289,6 +356,17 @@ const Header = () => {
               >
                 <FaHeart className="text-gray-700" />
                 <span>Wishlist</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  navigate("/order");
+                  setSidenav(false);
+                }}
+                className="flex items-center gap-3 p-2 border rounded hover:bg-gray-100"
+              >
+                <FaBoxOpen className="text-gray-700" />
+                <span>My Orders</span>
               </button>
 
               <button
@@ -330,9 +408,24 @@ const Header = () => {
               placeholder="Search for products, brands and more"
               className="w-full p-2 pl-10 border rounded-l bg-blue-50 text-gray-800 outline-none"
             />
+
             <FaSearch className="absolute left-3 top-3 text-gray-500" />
           </div>
 
+          {/* Voice Button Desktop */}
+          <button
+            onClick={startVoiceSearch}
+            className="right-3 text-gray-500 hover:text-blue-600"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+              className="w-5 h-5"
+            >
+              <path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 1 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 14 0h-2zm-5 9a1 1 0 0 0 1-1v-2a1 1 0 1 0-2 0v2a1 1 0 0 0 1 1z" />
+            </svg>
+          </button>
           <button
             onClick={() => {
               if (searchQuery.trim()) {

@@ -7,7 +7,7 @@ const CategoryBar = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchCategories = async () => { 
       try {
         const res = await api.get("/categories");
         setCategories(res.data.data || []);
