@@ -3,6 +3,7 @@ import api from '../../api';
 import { FaBox, FaTruck, FaCheckCircle, FaClock, FaTimesCircle } from "react-icons/fa";
 import HeaderCopy from "../../components/home/Header-copy/HeaderCopy";
 import { Link } from "react-router-dom";
+import BottomNav from "../../components/home/BottomNav/BottomNav";
 
 const Myorders = () => {
   const [orders, setOrders] = useState([]);
@@ -118,6 +119,7 @@ const Myorders = () => {
           })
         )}
       </div>
+      <BottomNav/>
     </>
   );
 };

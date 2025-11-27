@@ -33,7 +33,7 @@ const CategoryBar = () => {
             <img
               src={
                 cat.image
-                  ? `${process.env.REACT_APP_API_URL}/storage/${cat.image}`
+                  ? `${process.env.REACT_APP_API_URL}/public/${cat.image}`
                   : "/placeholder.jpg"
               }
               alt={cat.name}

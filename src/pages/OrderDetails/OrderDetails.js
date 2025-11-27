@@ -3,6 +3,7 @@ import api from "../../api";
 import HeaderCopy from "../../components/home/Header-copy/HeaderCopy";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import BottomNav from "../../components/home/BottomNav/BottomNav";
 
 const OrderDetails = () => {
     const [orderItems, setOrderItems] = useState([]);
@@ -129,6 +130,18 @@ const OrderDetails = () => {
                 </div>
             </div>
 
+            {/* ---------- CANCEL ORDER BUTTON ---------- */}
+            {order_status === "pending" && (
+                <div className="mt-6 text-center">
+                    <button
+                        onClick={() => handleCancelOrder(id)}
+                        className="px-5 py-2 bg-red-600 text-white text-sm font-semibold rounded-lg shadow hover:bg-red-700 transition"
+                    >
+                        Cancel Order
+                    </button>
+                </div>
+            )}
+
             {/* ---------- ITEMS LIST ---------- */}
             <div className="bg-white mt-6 p-6 rounded-xl shadow border border-gray-200 mx-4 sm:mx-6 md:mx-10">
                 <h3 className="text-lg font-semibold text-gray-700 mb-5">Items in this Order</h3>
@@ -143,7 +156,7 @@ const OrderDetails = () => {
                         >
                             {/* Product Image */}
                             <img
-                                src={`${process.env.REACT_APP_API_URL}/storage/${item.product.image}`}
+                                src={`${process.env.REACT_APP_API_URL}/public/${item.product.image}`}
                                 alt={item.product.name}
                                 className="w-20 h-20 rounded-md object-cover border shrink-0"
                             />
@@ -194,6 +207,7 @@ const OrderDetails = () => {
                     ))
                 )}
             </div>
+            <BottomNav />
         </>
     );
 

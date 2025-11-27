@@ -22,7 +22,7 @@ const BottomNav = () => {
           <BsGrid size={22} />
           <span>Categories</span>
         </Link>
-        <Link to="mobile-account" className="flex flex-col items-center justify-center">
+        <Link to="/mobile-account" className="flex flex-col items-center justify-center">
           <FaUser size={22} />
           <span>Account</span>
         </Link>

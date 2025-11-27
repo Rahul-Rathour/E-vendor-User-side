@@ -48,21 +48,22 @@ const Cart = () => {
 
           {/* Cart Items */}
           <div className="mt-5 space-y-4">
-            {cart.map((item) => (
+            {cart.map((item) => ( 
               <div
                 key={item.id}
                 className="grid grid-cols-1 lgl:grid-cols-5 items-center gap-4 bg-white p-4 shadow-sm rounded-md"
               >
                 {/* Product Info */}
-                <div className="flex items-center col-span-2">
+                <div className="flex items-center col-span-2" >
                   <img
                     src={
                       item.product.image
-                        ? `${process.env.REACT_APP_API_URL}/storage/${item.product.image}`
+                        ? `${process.env.REACT_APP_API_URL}/public/${item.product.image}`
                         : "/placeholder.jpg"
                     }
                     alt={item.product.name}
-                    className="w-20 h-20 object-cover rounded mr-4"
+                    onClick={()=> navigate(`/product/${item.product.id}`)}
+                    className="w-20 h-20 object-cover rounded mr-4 cursor-pointer"
                   />
                   <div>
                     <h3 className="font-semibold text-lg">{item.product.name}</h3>

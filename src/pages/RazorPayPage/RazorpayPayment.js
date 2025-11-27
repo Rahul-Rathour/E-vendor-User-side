@@ -36,8 +36,13 @@ const RazorpayPayment = () => {
             navigate("/paymentFailed");
           }
         },
+        modal: {
+          ondismiss: function () {
+            navigate("/payment-cancelled");
+          },
+        },
         prefill: {
-          name: "User",
+          name: "User", 
           email: "user@example.com",
         },
         theme: {

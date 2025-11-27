@@ -50,6 +50,7 @@ import RazorpayPayment from "./pages/RazorPayPage/RazorpayPayment";
 import OrderDetails from "./pages/OrderDetails/OrderDetails";
 import PaymentFailed from "./pages/checkout/PaymentFailed";
 import Categories from "./pages/categories/Categories";
+import PaymentCancelled from "./pages/PaymentCancelled/PaymentCancelled";
 
 
 
@@ -109,6 +110,7 @@ const router = createBrowserRouter(
       <Route path="/paymentFailed" element={<PaymentFailed/>}/>
       <Route path="/razorpay" element={<RazorpayPayment />} />
       <Route path="/categories" element={<Categories/>}/> 
+      <Route path="/payment-cancelled" element={<PaymentCancelled/>}/>
 
 
 

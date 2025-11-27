@@ -8,7 +8,7 @@ const ProductBanner = ({ itemsPerPageFromBanner }) => {
   const [girdViewActive, setGridViewActive] = useState(true);
   const [listViewActive, setListViewActive] = useState(false);
   useEffect(() => {
-    const gridView = document.querySelector(".gridView");
+    const gridView = document.querySelector(".gridView"); 
     const listView = document.querySelector(".listView");
 
     gridView.addEventListener("click", () => {

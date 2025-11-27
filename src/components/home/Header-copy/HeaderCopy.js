@@ -207,7 +207,7 @@ const HeaderCopy = () => {
                                         <img
                                             src={
                                                 item.image
-                                                    ? `${process.env.REACT_APP_API_URL}/storage/${item.image}`
+                                                    ? `${process.env.REACT_APP_API_URL}/public/${item.image}`
                                                     : "/placeholder.jpg"
                                             }
                                             alt={item.name}
@@ -431,7 +431,7 @@ const HeaderCopy = () => {
                                         <img
                                             src={
                                                 item.image
-                                                    ? `${process.env.REACT_APP_API_URL}/storage/${item.image}`
+                                                    ? `${process.env.REACT_APP_API_URL}/public/${item.image}`
                                                     : "/placeholder.jpg"
                                             }
                                             alt={item.name}

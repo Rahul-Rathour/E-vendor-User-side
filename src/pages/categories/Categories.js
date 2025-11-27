@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../api";
 import HeaderCopy from "../../components/home/Header-copy/HeaderCopy";
+import BottomNav from "../../components/home/BottomNav/BottomNav";
 
 const Categories = () => {
     const [categories, setCategories] = useState([]);
@@ -52,6 +53,7 @@ const Categories = () => {
                     ))}
                 </div>
             </div>
+            <BottomNav/>
         </>
     );
 };

@@ -65,11 +65,11 @@ const ProductDetails = () => {
               className="w-full h-full object-cover rounded-md shadow-md"
               src={
                 productInfo.image
-                  ? `${process.env.REACT_APP_API_URL}/storage/${productInfo.image}`
+                  ? `${process.env.REACT_APP_API_URL}/public/${productInfo.image}`
                   : "/placeholder.jpg"
               }
               alt={productInfo.name}
-            />
+            /> 
           </div>
 
           {/* Product Info */}

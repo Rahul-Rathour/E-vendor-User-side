@@ -7,6 +7,7 @@ import api from "../../api"; // ✅ your axios instance
 import { toast } from "react-toastify";
 import { MdOutlineLabelImportant } from "react-icons/md";
 import { GiReturnArrow } from "react-icons/gi";
+import Breadcrumbs from "../../components/pageProps/Breadcrumbs";
 
 const WishlistPage = () => {
   const navigate = useNavigate();
@@ -35,7 +36,7 @@ const WishlistPage = () => {
             name: w.product.name,
             price: w.product.price,
             image: w.product.image
-              ? `${process.env.REACT_APP_API_URL}/storage/${w.product.image}`
+              ? `${process.env.REACT_APP_API_URL}/public/${w.product.image}`
               : "/placeholder.jpg",
           }));
           setWishlistItems(items);
@@ -73,6 +74,7 @@ const WishlistPage = () => {
 
   return (
     <div className="max-w-container mx-auto px-4 py-8">
+      <Breadcrumbs title="Products" />
       <h1 className="text-2xl font-bold mb-6 text-primeColor text-center md:text-left">
         My Wishlist
       </h1>
@@ -101,7 +103,7 @@ const WishlistPage = () => {
                 <img
                   src={item.image}
                   alt={item.name}
-                  onClick={() => navigate(`/product/${item.id}`)}
+                  onClick={() => navigate(`/product/${item.id}`)} 
                   className="w-full h-64 object-contain p-6 transition-transform duration-700 group-hover:scale-105"
                 />
 
