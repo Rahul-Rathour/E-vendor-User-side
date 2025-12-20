@@ -108,13 +108,13 @@ const SearchResults = () => {
                   <span className="absolute top-4 left-4 bg-brandColor text-white text-sm px-3 py-1 rounded-md font-medium">
                     New
                   </span>
-                )}
+                )} 
 
                 <img
                   src={
                     item.image
-                      ? `${process.env.REACT_APP_API_URL}/storage/${item.image}`
-                      : "/placeholder.jpg"
+                      ? `${process.env.REACT_APP_API_URL}/public/${item.image}`
+                      : "/placeholder.jpg" 
                   }
                   alt={item.name}
                   onClick={() =>
