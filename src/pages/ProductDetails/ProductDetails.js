@@ -4,6 +4,7 @@ import Breadcrumbs from "../../components/pageProps/Breadcrumbs";
 import ProductInfo from "../../components/pageProps/productDetails/ProductInfo";
 import ProductsOnSale from "../../components/pageProps/productDetails/ProductsOnSale";
 import api from "../../api"; // your axios instance
+import ReviewsSection from "../../components/productDetails/ReviewsSection";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -11,6 +12,12 @@ const ProductDetails = () => {
   const [prevLocation, setPrevLocation] = useState("");
   const [productInfo, setProductInfo] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // ⭐ NEW: Review states
+  const [reviews, setReviews] = useState([]);
+  const [loadingReviews, setLoadingReviews] = useState(true);
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState("");
 
   useEffect(() => {
     setPrevLocation(location.pathname);
@@ -30,7 +37,42 @@ const ProductDetails = () => {
     };
 
     fetchProduct();
+    fetchReviews();
   }, [id, location.pathname]);
+
+  // ⭐ Fetch reviews for this product
+  const fetchReviews = async () => {
+    try {
+      const res = await api.get(`/products/${id}/reviews`);
+      setReviews(res.data);
+    } catch (error) {
+      console.error("Error fetching reviews:", error);
+    } finally {
+      setLoadingReviews(false);
+    }
+  };
+  // ⭐ Submit review
+  const handleSubmitReview = async (e) => {
+    e.preventDefault();
+
+    try {
+      await api.post("/reviews", {
+        product_id: id,
+        rating,
+        comment,
+      });
+
+      alert("Review added successfully!");
+
+      setComment("");
+      setRating(5);
+
+      fetchReviews(); // refresh reviews
+    } catch (error) {
+      console.log("Error adding review: ", error);
+      alert(error.response?.data?.message || "Something went wrong");
+    }
+  };
 
   if (loading)
     return (
@@ -69,13 +111,58 @@ const ProductDetails = () => {
                   : "/placeholder.jpg"
               }
               alt={productInfo.name}
-            /> 
+            />
           </div>
 
           {/* Product Info */}
           <div className="h-full w-full md:col-span-2 xl:col-span-3 xl:p-14 flex flex-col gap-6 justify-center">
             <ProductInfo productInfo={productInfo} />
           </div>
+        </div>
+
+        {/* ---------------------- REVIEWS SECTION ---------------------- */}
+
+        <div className="max-w-container mx-auto px-4 mt-10">
+          <ReviewsSection reviews={reviews} />
+
+          {/* Add Review Form */}
+          <form
+            onSubmit={handleSubmitReview}
+            className="bg-white p-5 rounded shadow mt-8"
+          >
+            <h3 className="text-xl font-semibold mb-3">Write a Review</h3>
+
+            <label className="block mb-1 font-medium">Rating</label>
+            <select
+              className="border p-2 rounded w-full"
+              value={rating}
+              onChange={(e) => setRating(e.target.value)}
+            >
+              <option value="5">5 - Excellent</option>
+              <option value="4">4 - Very Good</option>
+              <option value="3">3 - Good</option>
+              <option value="2">2 - Fair</option>
+              <option value="1">1 - Poor</option>
+            </select>
+
+            <label className="block mt-4 mb-1 font-medium">Comment</label>
+            <textarea
+              className="border p-3 rounded w-full"
+              rows="3"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="Share your experience..."
+            />
+
+            <button
+              type="submit"
+              className="mt-4 bg-brandColor hover:bg-brandColor/70 text-white px-4 py-2 rounded"
+            >
+              Submit Review
+            </button>
+          </form>
+
+
         </div>
       </div>
     </div>
