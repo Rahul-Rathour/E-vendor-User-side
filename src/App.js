@@ -51,6 +51,9 @@ import OrderDetails from "./pages/OrderDetails/OrderDetails";
 import PaymentFailed from "./pages/checkout/PaymentFailed";
 import Categories from "./pages/categories/Categories";
 import PaymentCancelled from "./pages/PaymentCancelled/PaymentCancelled";
+import api from "./api";
+import { useEffect } from "react";
+import InvoicePage from "./pages/InvoicePage";
 
 
 
@@ -89,6 +92,7 @@ const router = createBrowserRouter(
         <Route path="/offer" element={<Offer />}></Route>
         <Route path="/product/:id" element={<ProductDetails />}></Route>
         <Route path="/cart" element={<Cart />}></Route>
+        <Route path="/invoice" element={<InvoicePage/>}></Route>
         <Route path="/wishlist" element={<Wishlist />}></Route>
         <Route path="/paymentgateway" element={<Payment />}></Route>
         <Route path="/profile" element={<Myprofile />} />
@@ -107,10 +111,10 @@ const router = createBrowserRouter(
       <Route path="/logout" element={<Logout />} />
       <Route path="/checkout" element={<CheckoutPage />} />
       <Route path="/orderSuccess" element={<OrderSuccess />} />
-      <Route path="/paymentFailed" element={<PaymentFailed/>}/>
+      <Route path="/paymentFailed" element={<PaymentFailed />} />
       <Route path="/razorpay" element={<RazorpayPayment />} />
-      <Route path="/categories" element={<Categories/>}/> 
-      <Route path="/payment-cancelled" element={<PaymentCancelled/>}/>
+      <Route path="/categories" element={<Categories />} />
+      <Route path="/payment-cancelled" element={<PaymentCancelled />} />
 
 
 
@@ -130,6 +134,17 @@ const router = createBrowserRouter(
 );
 
 function App() {
+  useEffect(() => {
+    api.get("/home-setting")
+      .then(res => {
+        if (res.data?.title) {
+          document.title = res.data.title;
+        }
+      })
+      .catch(err => {
+        console.error("Home setting error:", err);
+      });
+  }, []);
   return (
     <CartProvider>
       <div className="font-bodyFont">

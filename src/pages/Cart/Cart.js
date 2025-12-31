@@ -21,7 +21,7 @@ const Cart = () => {
       (sum, item) => sum + item.product.price * item.quantity,
       0
     );
-    setTotalAmt(total);
+    setTotalAmt(total); 
   }, [cart]);
 
   useEffect(() => {

@@ -11,7 +11,7 @@ const RazorpayPayment = () => {
 
   useEffect(() => {
     if (!state) return navigate("/checkout");
-
+ 
     const loadRazorpay = () => {
       const script = document.createElement("script");
       script.src = "https://checkout.razorpay.com/v1/checkout.js";
@@ -25,7 +25,7 @@ const RazorpayPayment = () => {
         amount: finalTotal * 100,
         currency: "INR",
         name: "My Shop",
-        description: "Order Payment",
+        description: "Order Payment", 
         handler: async function (response) {
           // After successful payment
           const success = await checkout(shippingAddress, "Online");

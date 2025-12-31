@@ -14,6 +14,12 @@ const CheckoutPage = () => {
   const { totalAmt, shippingCharge, cart } = state;
   const finalTotal = totalAmt + shippingCharge;
 
+  const generateOrderNumber = () => {
+    return "ORD-" + Math.random().toString(36).substring(2, 10).toUpperCase();
+  };
+
+  const order_number = generateOrderNumber();
+
   const handleConfirmCheckout = async () => {
     if (!shippingAddress.trim()) {
       alert("Please enter your shipping address.");
@@ -22,8 +28,8 @@ const CheckoutPage = () => {
 
     // COD Flow
     if (paymentMethod === "COD") {
-      const success = await checkout(shippingAddress, "COD");
-      if (success) navigate("/orderSuccess");
+      const success = await checkout(shippingAddress, "COD", order_number);
+      if (success) navigate("/orderSuccess", { state: { totalAmt, shippingCharge, shippingAddress, cart, order_number } });
       return;
     }
 

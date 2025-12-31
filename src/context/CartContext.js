@@ -87,13 +87,14 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  const checkout = async (shippingAddress, paymentMethod) => {
+  const checkout = async (shippingAddress, paymentMethod,order_number) => {
     try {
       const res = await api.post(
         "/cart-checkout",
         {
           shipping_address: shippingAddress,
           payment_method: paymentMethod,
+          order_number: order_number,
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
