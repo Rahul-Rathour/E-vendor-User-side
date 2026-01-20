@@ -5,7 +5,7 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import Header from '../../components/home/Header/Header';
 import logonew from '../../assets/images/logonew.jpg';
 import Footer from '../../components/home/Footer/Footer';
-import api from '../../api'; // ✅ Keep your API integration
+import api from '../../api';
 
 const Login = () => {
   const [email, setEmail] = useState('');

@@ -16,10 +16,10 @@ const Home = () => {
       <div className="max-w-container mx-auto px-4">
         <AllCategory />
         <Sale />
-        <NewArrivals />
-        <BestSellers />
+        {/* <NewArrivals /> */}
+        <BestSellers /> {/* done */}
         <YearProduct />
-        <SpecialOffers />
+        <SpecialOffers /> {/* done */}
       </div>
     </div>
   );

@@ -21,7 +21,7 @@ const Categories = () => {
     }, []);
 
     const handleClick = (cat) => {
-        navigate(`/category/${cat.id}`);
+        navigate(`/category/${cat.id}`); 
     };
 
     return (
@@ -40,7 +40,7 @@ const Categories = () => {
                             <img
                                 src={
                                     cat.image
-                                        ? `${process.env.REACT_APP_API_URL}/storage/${cat.image}`
+                                        ? `${process.env.REACT_APP_API_URL}/public/${cat.image}`
                                         : "/placeholder.jpg"
                                 }
                                 alt={cat.name}

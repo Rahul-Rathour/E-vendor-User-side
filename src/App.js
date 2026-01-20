@@ -116,10 +116,6 @@ const router = createBrowserRouter(
       <Route path="/categories" element={<Categories />} />
       <Route path="/payment-cancelled" element={<PaymentCancelled />} />
 
-
-
-
-
       <Route path="/account" element={<AccountLayout />}>
         <Route index element={<Myprofile />} />
         <Route path="profile" element={<Myprofile />} />

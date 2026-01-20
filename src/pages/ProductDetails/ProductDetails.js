@@ -2,25 +2,30 @@ import React, { useEffect, useState } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import Breadcrumbs from "../../components/pageProps/Breadcrumbs";
 import ProductInfo from "../../components/pageProps/productDetails/ProductInfo";
-import ProductsOnSale from "../../components/pageProps/productDetails/ProductsOnSale";
-import api from "../../api"; // your axios instance
 import ReviewsSection from "../../components/productDetails/ReviewsSection";
+import ProductThumbnails from "../../components/pageProps/productDetails/ProductThumbnails";
+import ZoomImage from "../../components/designLayouts/zoomImage/ZoomImage";
+import api from "../../api";
 
 const ProductDetails = () => {
   const { id } = useParams();
   const location = useLocation();
+
   const [prevLocation, setPrevLocation] = useState("");
   const [productInfo, setProductInfo] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // ⭐ NEW: Review states
   const [reviews, setReviews] = useState([]);
   const [loadingReviews, setLoadingReviews] = useState(true);
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
 
+  // NEW: Stores selected media (image or video)
+  const [selectedMedia, setSelectedMedia] = useState(null);
+
   useEffect(() => {
     setPrevLocation(location.pathname);
+
     const fetchProduct = async () => {
       try {
         const res = await api.get(`/product/${id}`);
@@ -40,7 +45,17 @@ const ProductDetails = () => {
     fetchReviews();
   }, [id, location.pathname]);
 
-  // ⭐ Fetch reviews for this product
+  // Set default media to main image after loading product
+  useEffect(() => {
+    if (productInfo) {
+      setSelectedMedia({
+        type: "image",
+        value: productInfo.image
+      });
+    }
+  }, [productInfo]);
+
+  // ⭐ Fetch reviews
   const fetchReviews = async () => {
     try {
       const res = await api.get(`/products/${id}/reviews`);
@@ -51,6 +66,7 @@ const ProductDetails = () => {
       setLoadingReviews(false);
     }
   };
+
   // ⭐ Submit review
   const handleSubmitReview = async (e) => {
     e.preventDefault();
@@ -63,13 +79,10 @@ const ProductDetails = () => {
       });
 
       alert("Review added successfully!");
-
       setComment("");
       setRating(5);
-
-      fetchReviews(); // refresh reviews
+      fetchReviews();
     } catch (error) {
-      console.log("Error adding review: ", error);
       alert(error.response?.data?.message || "Something went wrong");
     }
   };
@@ -96,36 +109,50 @@ const ProductDetails = () => {
         </div>
 
         <div className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-6 gap-4 h-full -mt-5 xl:-mt-8 pb-10 bg-gray-100 p-4 rounded-lg">
-          {/* Left Section - Related/Offers */}
-          <div className="h-full">
-            <ProductsOnSale />
-          </div>
 
-          {/* Product Image */}
-          <div className="h-full xl:col-span-2 flex justify-center items-center">
-            <img
-              className="w-full h-full object-cover rounded-md shadow-md"
-              src={
-                productInfo.image
-                  ? `${process.env.REACT_APP_API_URL}/public/${productInfo.image}`
-                  : "/placeholder.jpg"
-              }
-              alt={productInfo.name}
+          {/* LEFT — Thumbnails */}
+          <div className="h-full order-2 md:order-1">
+            <ProductThumbnails
+              productInfo={productInfo}
+              setSelectedMedia={setSelectedMedia}
             />
           </div>
 
-          {/* Product Info */}
-          <div className="h-full w-full md:col-span-2 xl:col-span-3 xl:p-14 flex flex-col gap-6 justify-center">
+          {/* CENTER — Main Media Display */}
+          <div className="h-full xl:col-span-2 flex justify-center items-center order-1 md:order-2">
+            <div className="w-full h-full rounded-md shadow-md overflow-hidden">
+
+              {/* ✔ Show Image */}
+              {selectedMedia?.type === "image" && (
+                <ZoomImage
+                  src={`${process.env.REACT_APP_API_URL}/public/${selectedMedia.value}`}
+                />
+              )}
+
+              {/* ✔ Show Video */}
+              {selectedMedia?.type === "video" && (
+                <iframe
+                  className="w-full h-full rounded-md"
+                  src={`https://www.youtube.com/embed/${selectedMedia.value}`}
+                  title="Product Video"
+                  allowFullScreen
+                ></iframe>
+              )}
+
+            </div>
+          </div>
+
+          {/* RIGHT — Product info */}
+          <div className="h-full w-full md:col-span-2 xl:col-span-3 xl:p-14 flex flex-col gap-6 justify-center order-3">
             <ProductInfo productInfo={productInfo} />
           </div>
         </div>
 
-        {/* ---------------------- REVIEWS SECTION ---------------------- */}
-
+        {/* REVIEWS */}
         <div className="max-w-container mx-auto px-4 mt-10">
           <ReviewsSection reviews={reviews} />
 
-          {/* Add Review Form */}
+          {/* REVIEW FORM */}
           <form
             onSubmit={handleSubmitReview}
             className="bg-white p-5 rounded shadow mt-8"
@@ -161,8 +188,6 @@ const ProductDetails = () => {
               Submit Review
             </button>
           </form>
-
-
         </div>
       </div>
     </div>

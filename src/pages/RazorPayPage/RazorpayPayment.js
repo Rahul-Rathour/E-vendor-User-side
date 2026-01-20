@@ -7,7 +7,7 @@ const RazorpayPayment = () => {
   const navigate = useNavigate();
   const { checkout } = useCart();
 
-  const { finalTotal, shippingAddress } = state || {};
+  const { totalAmt, shippingCharge, finalTotal, shippingAddress, cart, order_number } = state || {};
 
   useEffect(() => {
     if (!state) return navigate("/checkout");
@@ -28,10 +28,10 @@ const RazorpayPayment = () => {
         description: "Order Payment", 
         handler: async function (response) {
           // After successful payment
-          const success = await checkout(shippingAddress, "Online");
+          const success = await checkout(shippingAddress, "Online",order_number);
 
           if (success) {
-            navigate("/orderSuccess");
+            navigate("/orderSuccess",{ state: { totalAmt, shippingCharge, shippingAddress, cart, order_number } });
           } else {
             navigate("/paymentFailed");
           }

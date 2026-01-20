@@ -37,8 +37,12 @@ const CheckoutPage = () => {
     navigate("/razorpay", {
       state: {
         finalTotal,
+        totalAmt,
+        shippingCharge,
+        cart,
         shippingAddress,
         paymentMethod: "Online",
+        order_number,
       },
     });
   };

@@ -27,7 +27,7 @@ const CategoryBar = () => {
         >
           {/* Main Category Image + Name */}
           <div
-            onClick={() => navigate(`/category/${cat.id}`)}
+            onClick={() => navigate(`/category/${cat.id}`)} 
             className="flex flex-col items-center hover:scale-105 transition-transform duration-200"
           >
             <img

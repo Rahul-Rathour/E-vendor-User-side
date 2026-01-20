@@ -37,7 +37,7 @@ const CategoryProducts = () => {
     setItemsPerPage(value);
   };
 
-  // ❤️ Wishlist Logic
+  //  Wishlist Logic
   const handleAddToWishlist = async (productId) => {
     const user = JSON.parse(localStorage.getItem("user"));
     if (!user) {

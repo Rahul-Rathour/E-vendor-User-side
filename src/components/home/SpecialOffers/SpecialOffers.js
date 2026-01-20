@@ -1,54 +1,56 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Heading from "../Products/Heading";
 import Product from "../Products/Product";
-import {
-  spfOne,
-  spfTwo,
-  spfThree,
-  spfFour,
-} from "../../../assets/images/index";
+import api from "../../../api";
+import { toast } from "react-toastify";
 
 const SpecialOffers = () => {
+  const [product_info, setProductInfo] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(()=>{
+    const fetchProduct = async()=>{
+      try {
+        const res = await api.get("/products/special-offers");
+        if(res.data.status){
+          setProductInfo(res.data.data);
+        }
+      } catch (error) {
+        toast.error("Error fetching products...");
+      }
+      finally{
+        setLoading(false);
+      }
+    };
+    fetchProduct();
+  },[]);
+
+  if (loading)
+    return (
+      <div className="flex justify-center items-center h-[60vh] text-gray-500 text-lg">
+        Loading products...
+      </div>
+    );
+
   return (
     <div className="w-full pb-20">
-      <Heading heading="Special Offerss" />
+      <Heading heading="Special Offers" />
       <div className="w-full grid grid-cols-1 md:grid-cols-2 lgl:grid-cols-3 xl:grid-cols-4 gap-10">
-        <Product
-          _id="1101"
-          img={spfOne}
-          productName="Cap for Boys"
-          price="35.00"
-          color="Blank and White"
+        {product_info.map((item)=>(
+          <Product
+          key = {item.id} 
+          _id={item.id}
+          img={`${process.env.REACT_APP_API_URL}/public/${item.image}`}
+          productName={item.name}
+          price={item.price}
+          color="Default"
           badge={true}
-          des="Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic excepturi quibusdam odio deleniti reprehenderit facilis."
-        />
-        <Product
-          _id="1102"
-          img={spfTwo}
-          productName="Tea Table"
-          price="180.00"
-          color="Gray"
-          badge={true}
-          des="Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic excepturi quibusdam odio deleniti reprehenderit facilis."
-        />
-        <Product
-          _id="1103"
-          img={spfThree}
-          productName="Headphones"
-          price="25.00"
-          color="Mixed"
-          badge={true}
-          des="Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic excepturi quibusdam odio deleniti reprehenderit facilis."
-        />
-        <Product
-          _id="1104"
-          img={spfFour}
-          productName="Sun glasses"
-          price="220.00"
-          color="Black"
-          badge={true}
-          des="Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic excepturi quibusdam odio deleniti reprehenderit facilis."
-        />
+          badge_text = "Offer"
+          des={item.description}
+          />
+        ))}
+        
+        
       </div>
     </div>
   );

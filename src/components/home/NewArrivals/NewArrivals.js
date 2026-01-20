@@ -16,10 +16,10 @@ import SamplePrevArrow from "./SamplePrevArrow";
 
 const NewArrivals = () => {
 
- const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  
+
 
 
   const settings = {
@@ -58,23 +58,23 @@ const NewArrivals = () => {
   };
   return (
     <div className="w-full pb-16">
-      <Heading heading="New Arrivalss" />
+      <Heading heading="New Arrivals" />
       <Slider {...settings}>
-{users.map((user, index) => (
-  <div className="px-2" key={user.id || index}>
-    <Product
-      _id={user.id || "100001"}
-      img={newArrOne}
-      productName={user.name}
-      price={user.price}
-      color="Black"
-      badge={true}
-      des="Lorem ipsum dolor sit amet consectetur adipisicing elit."
-    />
-  </div>
-))}
+        {users.map((user, index) => (
+          <div className="px-2" key={user.id || index}>
+            <Product
+              _id={user.id || "100001"}
+              img={newArrOne}
+              productName={user.name}
+              price={user.price}
+              color="Black"
+              badge={true}
+              des="Lorem ipsum dolor sit amet consectetur adipisicing elit."
+            />
+          </div>
+        ))}
 
-       
+
       </Slider>
     </div>
   );

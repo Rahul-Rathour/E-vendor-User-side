@@ -62,20 +62,20 @@ const Product = (props) => {
   }
 
   return (
-    <div className="w-full relative group">
-      <div className="max-w-80 max-h-80 relative overflow-y-hidden ">
+    <div className="w-full relative group overflow-hidden bg-slate-50">
+      {/* <div className="max-w-80 max-h-80 relative overflow-y-hidden "> */}
+      <div className="w-60 h-64 relative overflow-hidden flex items-center justify-center">
         <div onClick={handleProductDetails} className="cursor-pointer">
           <Image className="w-full h-full" imgSrc={props.img} />
         </div>
         <div className="absolute top-6 left-8"> 
-          {props.badge && <Badge text="New" />} 
+          {props.badge && <Badge text={props.badge_text} />} 
         </div>
         <div className="w-full h-32 absolute -bottom-[130px] group-hover:bottom-0 duration-700 flex items-center justify-center">
           <ul className="flex items-center justify-center gap-4 font-titleFont">
             <li
               className="w-12 h-12 flex items-center justify-center rounded-full bg-white text-brandColor hover:bg-brandColor hover:text-white shadow-md hover:shadow-lg duration-300 cursor-pointer text-2xl"
               title="Compare">
-
               <GiReturnArrow />
             </li>
             <li
@@ -104,7 +104,6 @@ const Product = (props) => {
                 <BsSuitHeart />
               )}
             </li>
-
           </ul>
         </div>
       </div>
@@ -114,8 +113,8 @@ const Product = (props) => {
             {props.productName}
           </h2>
           <p className="text-[#767676] text-[14px]"> ₹ {props.price}</p>
-        </div>
-        <div>
+        </div> 
+        <div> 
           <p className="text-[#767676] text-[14px]">{props.color}</p>
         </div>
       </div>
