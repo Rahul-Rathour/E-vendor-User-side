@@ -19,7 +19,7 @@ const Sale = () => {
     try {
       const res = await api.get("products/new-arrivals");
       const items = res.data.data || [];
-      setNewArrivals(items.slice(0, 5)); // only first 5
+      setNewArrivals(items.slice(-5)); // only first 5
     } catch (err) {
       console.error("Error fetching new arrivals:", err);
     }

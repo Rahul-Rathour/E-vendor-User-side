@@ -1,6 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 
 const ReviewsSection = ({ reviews }) => {
+  const [showAll, setShowAll] = useState(false);
+
+  const limit = 3; // Number of reviews to show initially
+  const visibleReviews = showAll ? reviews : reviews.slice(0, limit);
+
   // Calculate average rating
   const avgRating =
     reviews.length > 0
@@ -16,7 +21,6 @@ const ReviewsSection = ({ reviews }) => {
 
   return (
     <div className="bg-white rounded-lg p-6 shadow mt-6">
-
       {/* ⭐ Average Rating Box */}
       <div className="flex gap-10">
         <div className="text-center">
@@ -29,9 +33,7 @@ const ReviewsSection = ({ reviews }) => {
         <div className="flex flex-col justify-between w-full">
           {[5, 4, 3, 2, 1].map((star, index) => {
             const count = ratingCount[index];
-            const percent = totalReviews
-              ? (count / totalReviews) * 100
-              : 0;
+            const percent = totalReviews ? (count / totalReviews) * 100 : 0;
 
             return (
               <div key={star} className="flex items-center gap-2">
@@ -52,14 +54,11 @@ const ReviewsSection = ({ reviews }) => {
       <hr className="my-6" />
 
       {/* ⭐ Individual Reviews */}
-      {reviews.length === 0 ? (
+      {visibleReviews.length === 0 ? (
         <p>No reviews yet.</p>
       ) : (
-        reviews.map((review) => (
-          <div
-            key={review.id}
-            className="border-b py-4 flex flex-col gap-2"
-          >
+        visibleReviews.map((review) => (
+          <div key={review.id} className="border-b py-4 flex flex-col gap-2">
             <div className="font-semibold text-gray-800">
               {review.user?.name || "Anonymous"}
             </div>
@@ -79,6 +78,18 @@ const ReviewsSection = ({ reviews }) => {
             )}
           </div>
         ))
+      )}
+
+      {/* 📌 Show More / Show Less Button */}
+      {reviews.length > limit && (
+        <div className="mt-4 text-center">
+          <button
+            onClick={() => setShowAll(!showAll)}
+            className="text-blue-600 font-medium hover:underline"
+          >
+            {showAll ? "Show Less ↑" : "Show More Reviews ↓"}
+          </button>
+        </div>
       )}
     </div>
   );

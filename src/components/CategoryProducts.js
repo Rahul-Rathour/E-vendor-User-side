@@ -17,6 +17,7 @@ const CategoryProducts = () => {
   const [products, setProducts] = useState([]);
   const [itemsPerPage, setItemsPerPage] = useState(12);
   const [activeWishlist, setActiveWishlist] = useState([]);
+  const [sortedProducts, setSortedProducts] = useState([]);
 
   // Fetch Category Products
   useEffect(() => {
@@ -24,6 +25,7 @@ const CategoryProducts = () => {
       try {
         const res = await api.get(`/categories/${id}/products`);
         setProducts(res.data.products || []);
+        setSortedProducts(res.data.products);
       } catch (err) {
         console.log(err);
       }
@@ -35,6 +37,31 @@ const CategoryProducts = () => {
   // Items Per Page Handler
   const itemsPerPageFromBanner = (value) => {
     setItemsPerPage(value);
+  };
+  // Sorting function
+  const handleSort = (type) => {
+    let sorted = [...products];
+
+    switch (type) {
+      case "New Arrival":
+        sorted = sorted.filter((p) => p.product_type === "new");
+        break;
+
+      case "Featured":
+        sorted = sorted.filter((p) => p.product_type === "special_offer");
+        break;
+
+      case "Final Offer":
+        sorted = sorted.filter((p) => p.product_type === "hot_deal");
+        break;
+        
+
+      default:
+        sorted = sorted.filter((p) => p.product_type === "none");
+        break;
+    }
+
+    setSortedProducts(sorted);
   };
 
   //  Wishlist Logic
@@ -70,7 +97,9 @@ const CategoryProducts = () => {
       <Breadcrumbs title="Products" />
 
       {/* Product Banner (Sort + Show) */}
-      <ProductBanner itemsPerPageFromBanner={itemsPerPageFromBanner} />
+      <ProductBanner itemsPerPageFromBanner={itemsPerPageFromBanner}
+        sortHandler={handleSort}
+      />
 
       {/* If No Products */}
       {products.length === 0 ? (
@@ -80,7 +109,7 @@ const CategoryProducts = () => {
       ) : (
         // 🎯 Pagination component (same as Shop)
         <Pagination
-          items={products}
+          items={sortedProducts}
           itemsPerPage={itemsPerPage}
           wishlistHandler={handleAddToWishlist}
           activeWishlist={activeWishlist}
@@ -92,5 +121,5 @@ const CategoryProducts = () => {
     </div>
   );
 };
- 
+
 export default CategoryProducts;

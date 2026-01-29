@@ -1,18 +1,32 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
+import { toast } from "react-toastify";
 
 const CheckoutPage = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
   const { checkout } = useCart();
+
   const [shippingAddress, setShippingAddress] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("COD");
 
-  if (!state) return <p className="text-center mt-10">No checkout data found.</p>;
+  if (!state)
+    return <p className="text-center mt-10">No checkout data found.</p>;
 
-  const { totalAmt, shippingCharge, cart } = state;
-  const finalTotal = totalAmt + shippingCharge;
+  const { totalAmt, cart } = state;
+
+  const calculateGSTAmount = (item) => {
+    const price = item.product.price * item.quantity;
+    return (price * item.product.gst) / 100;
+  };
+
+  const totalGST = cart.reduce(
+    (sum, item) => sum + calculateGSTAmount(item),
+    0
+  );
+
+  const finalTotal = totalAmt; // Already includes GST (from Cart page)
 
   const generateOrderNumber = () => {
     return "ORD-" + Math.random().toString(36).substring(2, 10).toUpperCase();
@@ -22,23 +36,34 @@ const CheckoutPage = () => {
 
   const handleConfirmCheckout = async () => {
     if (!shippingAddress.trim()) {
-      alert("Please enter your shipping address.");
+      toast.error("Please enter your shipping address.");
       return;
     }
 
-    // COD Flow
+    // COD
     if (paymentMethod === "COD") {
-      const success = await checkout(shippingAddress, "COD", order_number);
-      if (success) navigate("/orderSuccess", { state: { totalAmt, shippingCharge, shippingAddress, cart, order_number } });
+      const success = await checkout(
+        shippingAddress,
+        "COD",
+        order_number
+      );
+      if (success)
+        navigate("/orderSuccess", {
+          state: {
+            totalAmt: finalTotal,
+            shippingAddress,
+            cart,
+            order_number,
+          },
+        });
       return;
     }
 
-    // Razorpay Flow → redirect to razorpay page
+    // ONLINE
     navigate("/razorpay", {
       state: {
         finalTotal,
         totalAmt,
-        shippingCharge,
         cart,
         shippingAddress,
         paymentMethod: "Online",
@@ -55,26 +80,38 @@ const CheckoutPage = () => {
 
       {/* Order Items */}
       <div className="mb-6 border-b pb-4">
-        {cart.map((item) => (
-          <div key={item.id} className="flex justify-between py-2">
-            <p>{item.product.name} × {item.quantity}</p>
-            <p>₹{(item.product.price * item.quantity).toLocaleString()}</p>
-          </div>
-        ))}
+        {cart.map((item) => {
+          const price = item.product.price * item.quantity;
+          const gstAmount = calculateGSTAmount(item);
+
+          return (
+            <div key={item.id} className="py-3 border-b last:border-b-0">
+              <div className="flex justify-between">
+                <p>
+                  {item.product.name} × {item.quantity}
+                </p>
+                <p>₹{price.toFixed(2)}</p>
+              </div>
+
+              {/* GST Row */}
+              <p className="text-sm text-gray-600 flex justify-between mt-1">
+                <span>GST ({item.product.gst}%)</span>
+                <span>₹{gstAmount.toFixed(2)}</span>
+              </p>
+            </div>
+          );
+        })}
       </div>
 
       {/* Totals */}
       <div className="flex justify-between text-lg font-medium">
-        <p>Subtotal:</p>
-        <p>₹{totalAmt.toLocaleString()}</p>
+        <p>Total GST:</p>
+        <p>₹{totalGST.toFixed(2)}</p>
       </div>
-      <div className="flex justify-between text-lg font-medium">
-        <p>Shipping:</p>
-        <p>₹{shippingCharge}</p>
-      </div>
+
       <div className="flex justify-between text-xl font-bold mt-4 text-primeColor">
-        <p>Total:</p>
-        <p>₹{finalTotal.toLocaleString()}</p>
+        <p>Grand Total:</p>
+        <p>₹{finalTotal.toFixed(2)}</p>
       </div>
 
       {/* Shipping Address */}

@@ -11,8 +11,9 @@ const BestSellers = () => {
     const fetchProduct = async () => {
       try {
         const res = await api.get("/top-delivered-items");
+        const items = res.data.data || [];
         if (res.data.status) {
-          setProductInfo(res.data.data);
+          setProductInfo(items.slice(-4));
         }
       } catch (error) {
         console.error("Error fetching products: ", error);

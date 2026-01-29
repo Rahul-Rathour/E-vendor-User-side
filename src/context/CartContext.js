@@ -6,16 +6,15 @@ const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
-  // const token = localStorage.getItem("userToken");
   const [token, setToken] = useState(localStorage.getItem("userToken") || null);
 
-  // Update token whenever user logs in or logs out
+  // Sync token with localStorage
   const refreshToken = () => {
     const storedToken = localStorage.getItem("userToken");
     setToken(storedToken);
   };
 
-  // Fetch cart items from backend when user logs in
+  // Fetch user cart
   const fetchCart = async () => {
     if (!token) {
       setCart([]);
@@ -35,18 +34,25 @@ export const CartProvider = ({ children }) => {
     fetchCart();
   }, [token]);
 
-  // Add item to cart
-  const addToCart = async (productId, price) => {
+  // Add item to cart (GST added)
+  const addToCart = async (productId, price, gst) => {
     try {
       if (!token) {
         toast.error("Please login to add items to cart");
         return;
       }
+
       const res = await api.post(
         "/cart-add",
-        { product_id: productId, quantity: 1, price: price },
+        {
+          product_id: productId,
+          quantity: 1,
+          price: price,
+          gst: gst, // NEW FIELD
+        },
         { headers: { Authorization: `Bearer ${token}` } }
       );
+
       if (res.data.status) fetchCart();
     } catch (err) {
       toast.error("Failed to add item to cart");
@@ -54,40 +60,53 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  // Remove item from cart
+  // Remove item
   const removeFromCart = async (id) => {
     try {
-      const res = await api.delete(
-        `/cart-delete/${id}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await api.delete(`/cart-delete/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (res.data.status) fetchCart();
     } catch (err) {
       console.error("Error removing from cart:", err);
     }
   };
 
-  // Update quantity instantly + sync with backend
-  const updateQuantity = async (id, quantity, price) => {
+  // Update quantity (GST added)
+  const updateQuantity = async (id, quantity, price, gst) => {
+    // Instant UI update
     setCart((prev) =>
       prev.map((item) =>
-        item.id === id ? { ...item, quantity, product: { ...item.product, price } } : item
+        item.id === id
+          ? {
+              ...item,
+              quantity,
+              price,
+              gst,
+            }
+          : item
       )
     );
 
     try {
       const res = await api.post(
         `/cart-update/${id}`,
-        { quantity, price },
+        {
+          quantity,
+          price,
+          gst, // NEW FIELD
+        },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      if (res.data.status) fetchCart(); // ensure backend sync
+
+      if (res.data.status) fetchCart();
     } catch (err) {
       console.error("Error updating quantity:", err);
     }
   };
 
-  const checkout = async (shippingAddress, paymentMethod,order_number) => {
+  // Checkout
+  const checkout = async (shippingAddress, paymentMethod, order_number) => {
     try {
       const res = await api.post(
         "/cart-checkout",
@@ -112,10 +131,9 @@ export const CartProvider = ({ children }) => {
       alert("❌ Checkout failed!");
       return false;
     }
-  }; 
+  };
 
-
-
+  // Count items in cart
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
@@ -128,7 +146,7 @@ export const CartProvider = ({ children }) => {
         updateQuantity,
         checkout,
         fetchCart,
-        refreshToken, // IMPORTANT: Call this after login!
+        refreshToken,
       }}
     >
       {children}

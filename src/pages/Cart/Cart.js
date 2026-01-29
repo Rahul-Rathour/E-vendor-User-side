@@ -2,38 +2,41 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useCart } from "../../context/CartContext";
-import { useDispatch, useSelector } from "react-redux";
-
 
 import Breadcrumbs from "../../components/pageProps/Breadcrumbs";
-import { resetCart } from "../../redux/orebiSlice";
 import { emptyCart } from "../../assets/images/index";
-import ItemCard from "./ItemCard";
 
 const Cart = () => {
   const navigate = useNavigate();
-  const { cart, removeFromCart, updateQuantity, checkout } = useCart();
-  const [totalAmt, setTotalAmt] = useState(0);
-  const [shippingCharge, setShippingCharge] = useState(0);
+  const { cart, removeFromCart, updateQuantity } = useCart();
 
+  const [totalAmt, setTotalAmt] = useState(0);
+  const [gstToggle, setGstToggle] = useState({});
+
+  const toggleGST = (id) => {
+    setGstToggle((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  // Calculate total with GST included
   useEffect(() => {
-    let total = cart.reduce(
-      (sum, item) => sum + item.product.price * item.quantity,
-      0
-    );
-    setTotalAmt(total); 
+    let total = 0;
+
+    cart.forEach((item) => {
+      const price = item.product.price * item.quantity;
+      const gstAmount = (price * item.product.gst) / 100;
+      total += price + gstAmount;
+    });
+
+    setTotalAmt(total);
   }, [cart]);
 
-  useEffect(() => {
-    if (totalAmt <= 200 && totalAmt > 0) setShippingCharge(30);
-    else if (totalAmt <= 400) setShippingCharge(25);
-    else if (totalAmt > 400) setShippingCharge(20);
-    else setShippingCharge(0);
-  }, [totalAmt]);
+  const calculateGSTAmount = (item) => {
+    const price = item.product.price * item.quantity;
+    return (price * item.product.gst) / 100;
+  };
 
   return (
     <div className="max-w-container mx-auto px-4 min-h-screen bg-gray-50">
-      
       <Breadcrumbs title="Cart" />
 
       {cart.length > 0 ? (
@@ -48,13 +51,13 @@ const Cart = () => {
 
           {/* Cart Items */}
           <div className="mt-5 space-y-4">
-            {cart.map((item) => ( 
+            {cart.map((item) => (
               <div
                 key={item.id}
                 className="grid grid-cols-1 lgl:grid-cols-5 items-center gap-4 bg-white p-4 shadow-sm rounded-md"
               >
                 {/* Product Info */}
-                <div className="flex items-center col-span-2" >
+                <div className="flex items-center col-span-2">
                   <img
                     src={
                       item.product.image
@@ -62,27 +65,47 @@ const Cart = () => {
                         : "/placeholder.jpg"
                     }
                     alt={item.product.name}
-                    onClick={()=> navigate(`/product/${item.product.id}`)}
+                    onClick={() => navigate(`/product/${item.product.id}`)}
                     className="w-20 h-20 object-cover rounded mr-4 cursor-pointer"
                   />
                   <div>
-                    <h3 className="font-semibold text-lg">{item.product.name}</h3>
+                    <h3 className="font-semibold text-lg">
+                      {item.product.name}
+                    </h3>
                     <p className="text-gray-500 text-sm">
-                      ₹{item.product.price.toLocaleString()}
+                      ₹{item.product.price}
                     </p>
+
+                    {/* GST Toggle */}
+                    <button
+                      onClick={() => toggleGST(item.id)}
+                      className="text-sm text-blue-600 flex items-center gap-1 mt-1"
+                    >
+                      {gstToggle[item.id] ? "▲ Hide GST" : "▼ Show GST"}
+                    </button>
+
+                    {/* GST Detail */}
+                    {gstToggle[item.id] && (
+                      <div className="mt-2 text-sm text-gray-700 bg-gray-50 p-2 rounded">
+                        <p>GST: {item.product.gst}%</p>
+                        <p>
+                          GST Amount: ₹{calculateGSTAmount(item).toFixed(2)}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 {/* Price */}
                 <p className="text-gray-700 text-base">
-                  ₹{item.product.price.toLocaleString()}
+                  ₹{item.product.price}
                 </p>
 
                 {/* Quantity Controls */}
                 <div className="flex items-center justify-center">
                   <button
                     onClick={() =>
-                      updateQuantity(item.id, Math.max(1, item.quantity - 1), (item.product.price * (item.quantity-1)))
+                      updateQuantity(item.id, Math.max(1, item.quantity - 1))
                     }
                     className="px-2 py-1 bg-gray-200 rounded-l"
                   >
@@ -92,17 +115,21 @@ const Cart = () => {
                     {item.quantity}
                   </span>
                   <button
-                    onClick={() => updateQuantity(item.id, (item.quantity + 1), (item.product.price * (item.quantity+1)))}
+                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
                     className="px-2 py-1 bg-gray-200 rounded-r"
                   >
                     +
                   </button>
                 </div>
 
-                {/* Subtotal + Remove */}
+                {/* Subtotal */}
                 <div className="flex flex-col items-center gap-2">
                   <p className="font-semibold">
-                    ₹{(item.product.price * item.quantity).toLocaleString()}
+                    ₹
+                    {(
+                      item.product.price * item.quantity +
+                      calculateGSTAmount(item)
+                    ).toFixed(2)}
                   </p>
                   <button
                     onClick={() => removeFromCart(item.id)}
@@ -123,27 +150,31 @@ const Cart = () => {
               </h1>
               <div>
                 <p className="flex items-center justify-between border-b py-1.5 text-lg px-2 font-medium">
-                  Subtotal
-                  <span className="font-semibold tracking-wide font-titleFont">
-                    ₹{totalAmt.toLocaleString()}
+                  Total GST
+                  <span className="font-semibold">
+                    ₹
+                    {cart
+                      .reduce(
+                        (sum, item) => sum + calculateGSTAmount(item),
+                        0
+                      )
+                      .toFixed(2)}
                   </span>
                 </p>
-                <p className="flex items-center justify-between border-b py-1.5 text-lg px-2 font-medium">
-                  Shipping Charge
-                  <span className="font-semibold tracking-wide font-titleFont">
-                    ₹{shippingCharge}
-                  </span>
-                </p>
+
                 <p className="flex items-center justify-between py-1.5 text-lg px-2 font-bold text-primeColor">
-                  Total
+                  Grand Total
                   <span className="font-bold tracking-wide text-lg font-titleFont">
-                    ₹{(totalAmt + shippingCharge).toLocaleString()}
+                    ₹{totalAmt.toFixed(2)}
                   </span>
                 </p>
               </div>
+
               <div className="flex justify-end">
                 <button
-                  onClick={() => navigate("/checkout", { state: { totalAmt, shippingCharge, cart } })}
+                  onClick={() =>
+                    navigate("/checkout", { state: { totalAmt, cart } })
+                  }
                   className="w-52 h-10 bg-primeColor text-white hover:bg-black duration-300 rounded-md"
                 >
                   Proceed to Checkout

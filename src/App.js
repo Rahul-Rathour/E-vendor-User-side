@@ -31,7 +31,7 @@ import ProductDetails from "./pages/ProductDetails/ProductDetails";
 import Shop from "./pages/Shop/Shop";
 import Login from "./pages/Account/Login";
 import Wishlist from "./pages/Cart/Wishlist";
-import Myprofile from "./pages/Account/Myprofile";
+import Myprofile from "./pages/Account/Myprofile"; 
 import ManageAddress from "./pages/Account/ManageAddress";
 import AccountLayout from "./pages/Account/AccountLayout";
 import Myorder from "./pages/Account/Myorder";
@@ -90,7 +90,7 @@ const router = createBrowserRouter(
         <Route path="/productFilte" element={<ProductFilter />}></Route>
         {/* ==================== Header Navlink End here ===================== */}
         <Route path="/offer" element={<Offer />}></Route>
-        <Route path="/product/:id" element={<ProductDetails />}></Route>
+        
         <Route path="/cart" element={<Cart />}></Route>
         <Route path="/invoice" element={<InvoicePage/>}></Route>
         <Route path="/wishlist" element={<Wishlist />}></Route>
@@ -101,6 +101,7 @@ const router = createBrowserRouter(
         <Route path="/subcategory/:id" element={<SubcategoryProducts />} />
         <Route path="/search" element={<SearchResults />} />
       </Route>
+      <Route path="/product/:id" element={<ProductDetails />}></Route>
       <Route path="/signup" element={<SignUp />}></Route>
       <Route path="/signin" element={<SignIn />}></Route>
       <Route path="/login" element={<Login />}></Route>

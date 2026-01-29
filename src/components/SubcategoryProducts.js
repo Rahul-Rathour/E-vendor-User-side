@@ -16,10 +16,11 @@ const SubcategoryProducts = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const { addToCart } = useCart();
-
+ 
   const [products, setProducts] = useState([]);
   const [activeWishlist, setActiveWishlist] = useState([]);
-  const [itemsPerPage, setItemsPerPage] = useState(12);
+  const [itemsPerPage, setItemsPerPage] = useState(12); 
+  const [sortedProducts, setSortedProducts] = useState([]); 
 
   // ===========================================================================================
   // Fetch products under selected subcategory
@@ -29,12 +30,39 @@ const SubcategoryProducts = () => {
       try {
         const res = await api.get(`/subcategories/${id}/products`);
         setProducts(res.data.data || []);
+        setSortedProducts(res.data.data);
       } catch (err) {
         console.error("Error fetching subcategory products:", err);
       }
     };
     fetchProducts();
   }, [id]);
+
+   // Sorting function
+  const handleSort = (type) => {
+    let sorted = [...products];
+
+    switch (type) {
+      case "New Arrival":
+        sorted = sorted.filter((p) => p.product_type === "new");
+        break;
+
+      case "Featured":
+        sorted = sorted.filter((p) => p.product_type === "special_offer");
+        break;
+
+      case "Final Offer":
+        sorted = sorted.filter((p) => p.product_type === "hot_deal");
+        break;
+        
+
+      default:
+        sorted = sorted.filter((p) => p.product_type === "none");
+        break;
+    }
+
+    setSortedProducts(sorted);
+  };
 
   // ===========================================================================================
   // Wishlist Handler
@@ -155,11 +183,13 @@ const SubcategoryProducts = () => {
       <Breadcrumbs title="Products" />
 
       {/* Filter bar same as Shop page */}
-      <ProductBanner itemsPerPageFromBanner={itemsPerPageFromBanner} />
+      <ProductBanner itemsPerPageFromBanner={itemsPerPageFromBanner} 
+      sortHandler={handleSort}
+      />
 
       {/* Pagination Component - SAME AS SHOP COMPONENT */}
       <Pagination
-        items={products.map((p) => ({ ...p, Component: ProductCard }))}
+        items={sortedProducts.map((p) => ({ ...p, Component: ProductCard }))}
         itemsPerPage={itemsPerPage}
         customCard={(item) => <ProductCard prod={item} />}
       />

@@ -8,6 +8,7 @@ import api from "../../api";
 const Shop = () => {
   const [itemsPerPage, setItemsPerPage] = useState(12);
   const [products, setProducts] = useState([]);
+  const [sortedProducts, setSortedProducts] = useState([]);
 
   // Fetch products from API
   useEffect(() => {
@@ -17,6 +18,7 @@ const Shop = () => {
 
         if (res.data.status) {
           setProducts(res.data.data);
+          setSortedProducts(res.data.data);
         }
       } catch (error) {
         console.log("Error fetching products:", error);
@@ -30,6 +32,31 @@ const Shop = () => {
     setItemsPerPage(itemsPerPage);
   };
 
+  // Sorting function
+  const handleSort = (type) => {
+    let sorted = [...products];
+
+    switch (type) {
+      case "New Arrival":
+        sorted = sorted.filter((p) => p.product_type === "new");
+        break;
+
+      case "Featured":
+        sorted = sorted.filter((p) => p.product_type === "special_offer");
+        break;
+
+      case "Final Offer":
+        sorted = sorted.filter((p) => p.product_type === "hot_deal");
+        break;
+
+      default:
+        sorted = sorted.filter((p) => p.product_type === "none");
+        break;
+    }
+
+    setSortedProducts(sorted);
+  };
+
   return (
     <div className="max-w-container mx-auto px-4">
       <Breadcrumbs title="Products" />
@@ -40,10 +67,16 @@ const Shop = () => {
         </div>
 
         <div className="w-full mdl:w-[80%] lgl:w-[75%] h-full flex flex-col gap-10">
-          <ProductBanner itemsPerPageFromBanner={itemsPerPageFromBanner} />
+          
+          <ProductBanner 
+            itemsPerPageFromBanner={itemsPerPageFromBanner}
+            sortHandler={handleSort}
+          />
 
-          {/* Pass API products to Pagination */}
-          <Pagination items={products} itemsPerPage={itemsPerPage} /> 
+          <Pagination 
+            items={sortedProducts} 
+            itemsPerPage={itemsPerPage}
+          />
         </div>
       </div>
     </div>

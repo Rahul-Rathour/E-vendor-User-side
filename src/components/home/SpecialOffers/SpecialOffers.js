@@ -12,8 +12,9 @@ const SpecialOffers = () => {
     const fetchProduct = async()=>{
       try {
         const res = await api.get("/products/special-offers");
+        const items = res.data.data || [];
         if(res.data.status){
-          setProductInfo(res.data.data);
+          setProductInfo(items.slice(-4));
         }
       } catch (error) {
         toast.error("Error fetching products...");
