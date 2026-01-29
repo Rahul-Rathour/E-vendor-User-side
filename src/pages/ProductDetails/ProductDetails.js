@@ -50,6 +50,7 @@ const ProductDetails = () => {
     fetchProduct();
     fetchReviews();
   }, [id, location.pathname]);
+  
   useEffect(() => {
     if (productInfo?.category_id) {
       const fetchSimilar = async () => {
@@ -160,7 +161,7 @@ const ProductDetails = () => {
                       allowFullScreen
                     ></iframe>
                   )}
-
+ 
                 </div>
               </div>
 

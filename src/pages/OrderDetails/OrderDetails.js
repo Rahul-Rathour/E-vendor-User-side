@@ -29,10 +29,13 @@ const OrderDetails = () => {
         fetchOrderItems();
     }, [id]);
 
+    const handleProductDetails = (pid) => {
+        navigate(`/product/${pid}`);
+    };
+
     const handleCancelOrder = async (id) => {
         try {
             const response = await api.post(`order/update-status/${id}`, { status: "cancelled" });
-
             if (response.data.status) {
                 toast.success("Order cancelled successfully!");
                 navigate("/order");
@@ -40,7 +43,7 @@ const OrderDetails = () => {
                 toast.error("Failed to cancel order.");
             }
         } catch (error) {
-            console.error("Error cancelling order:", error);
+            console.log("Error cancelling order:", { id });
             toast.error("Something went wrong while cancelling the order.");
         }
     };
@@ -48,7 +51,6 @@ const OrderDetails = () => {
     return (
         <>
             <HeaderCopy />
-
             {/* ---------- ORDER STATUS + PROGRESS ---------- */}
             <div className="bg-white mt-6 p-6 rounded-xl shadow border border-gray-200 mx-4 sm:mx-6 md:mx-10">
                 <h3 className="text-lg font-semibold text-gray-700 mb-4">Delivery Status</h3>
@@ -152,7 +154,8 @@ const OrderDetails = () => {
                     orderItems.map((item) => (
                         <div
                             key={item.id}
-                            className="flex gap-3 w-full py-4 border-b last:border-b-0"
+                            className="flex gap-3 w-full py-4 border-b last:border-b-0 cursor-pointer"
+                            onClick={()=>handleProductDetails(item.product.id)}
                         >
                             {/* Product Image */}
                             <img
