@@ -9,14 +9,14 @@ const Logout = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Clear user-related data here (like localStorage, Redux, etc.)
+    // Clear user-related data here (like localStorage, Redux, etc.) 
     localStorage.removeItem('userToken');
     localStorage.removeItem('user');
     
-    // Redirect to home or login after 3 seconds
+    // Redirect to home or login after 3 seconds 
     const timer = setTimeout(() => {
       navigate('/'); // Redirect to home page
-    }, 3000);
+    }, 3000); 
 
     return () => clearTimeout(timer);
   }, [navigate]);

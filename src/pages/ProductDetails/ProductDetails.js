@@ -7,6 +7,8 @@ import ProductThumbnails from "../../components/pageProps/productDetails/Product
 import ZoomImage from "../../components/designLayouts/zoomImage/ZoomImage";
 import api from "../../api";
 import HeaderCopy from "../../components/home/Header-copy/HeaderCopy";
+import Footer from "../../components/home/Footer/Footer";
+import SpecialCase from "../../components/SpecialCase/SpecialCase";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -28,7 +30,7 @@ const ProductDetails = () => {
 
 
 
- 
+
   useEffect(() => {
     setPrevLocation(location.pathname);
 
@@ -50,7 +52,7 @@ const ProductDetails = () => {
     fetchProduct();
     fetchReviews();
   }, [id, location.pathname]);
-  
+
   useEffect(() => {
     if (productInfo?.category_id) {
       const fetchSimilar = async () => {
@@ -79,7 +81,7 @@ const ProductDetails = () => {
   const fetchReviews = async () => {
     try {
       const res = await api.get(`/products/${id}/reviews`);
-      setReviews(res.data);
+      setReviews(res.data.reviews);
     } catch (error) {
       console.error("Error fetching reviews:", error);
     } finally {
@@ -124,52 +126,52 @@ const ProductDetails = () => {
   return (
     <>
       <HeaderCopy />
+      <SpecialCase/>
       <div className="p-4">
         <div className="w-full mx-auto border-b border-gray-300 bg-white">
           <div className="max-w-container mx-auto px-4">
             <div className="xl:-mt-10 -mt-7">
-              <Breadcrumbs title={productInfo.name} prevLocation={prevLocation} />
+              <Breadcrumbs title={""} prevLocation={prevLocation} />
             </div>
 
             <div className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-6 gap-4 h-full -mt-5 xl:-mt-8 pb-10 bg-gray-100 p-4 rounded-lg">
 
               {/* LEFT — Thumbnails */}
-              <div className="h-full order-2 md:order-1">
+              <div className="order-2 md:order-1 lg:sticky lg:top-20 max-h-[85vh] overflow-y-auto">
                 <ProductThumbnails
                   productInfo={productInfo}
                   setSelectedMedia={setSelectedMedia}
                 />
               </div>
 
-              {/* CENTER — Main Media Display */}
-              <div className="h-full xl:col-span-2 flex justify-center items-center order-1 md:order-2">
+              {/* CENTER — Main Media */}
+              <div className="xl:col-span-2 flex justify-center items-start order-1 md:order-2 lg:sticky lg:top-20 max-h-[85vh]">
                 <div className="w-full h-full rounded-md shadow-md overflow-hidden">
 
-                  {/* ✔ Show Image */}
                   {selectedMedia?.type === "image" && (
                     <ZoomImage
                       src={`${process.env.REACT_APP_API_URL}/public/${selectedMedia.value}`}
                     />
                   )}
 
-                  {/* ✔ Show Video */}
                   {selectedMedia?.type === "video" && (
                     <iframe
                       className="w-full h-full rounded-md"
                       src={`https://www.youtube.com/embed/${selectedMedia.value}`}
-                      title="Product Video"
                       allowFullScreen
                     ></iframe>
                   )}
- 
+
                 </div>
               </div>
 
-              {/* RIGHT — Product info */}
-              <div className="h-full w-full md:col-span-2 xl:col-span-3 xl:p-14 flex flex-col gap-6 justify-center order-3">
+              {/* RIGHT — Product Info */}
+              <div className="w-full md:col-span-2 xl:col-span-3 xl:p-14 flex flex-col gap-6 order-3">
                 <ProductInfo productInfo={productInfo} />
               </div>
             </div>
+
+
 
             {/* REVIEWS */}
             <div className="max-w-container mx-auto px-4 mt-10">
@@ -239,11 +241,10 @@ const ProductDetails = () => {
                 </div>
               </div>
             )}
-
-
           </div>
         </div>
       </div>
+      <Footer />
     </>
   );
 };

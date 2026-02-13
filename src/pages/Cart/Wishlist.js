@@ -72,79 +72,87 @@ const WishlistPage = () => {
 
   if (loading) return <p className="p-4">Loading wishlist...</p>;
 
-  return (
-    <div className="max-w-container mx-auto px-4 py-8">
-      <Breadcrumbs title="Products" />
-      <h1 className="text-2xl font-bold mb-6 text-primeColor text-center md:text-left">
-        My Wishlist
-      </h1>
+ return (
+  <div className="max-w-container mx-auto px-4 py-8">
+    <Breadcrumbs title="Products" />
+    <h1 className="text-2xl font-bold mb-6 text-primeColor">
+      My Wishlist
+    </h1>
 
-      {wishlistItems.length === 0 ? (
-        <p className="text-center text-gray-500 mt-10">Your wishlist is empty.</p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          {wishlistItems.map((item) => (
-            <div
-              key={item.id}
-              className="w-full relative group bg-white border rounded-md overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300"
+    {wishlistItems.length === 0 ? (
+      <p className="text-center text-gray-500 mt-10">Your wishlist is empty.</p>
+    ) : (
+      <div className="flex flex-col gap-5">
+        {wishlistItems.map((item) => (
+          <div
+            key={item.id}
+            className="flex flex-col md:flex-row items-center md:items-start bg-white border rounded-lg shadow-sm p-4 relative"
+          >
+            {/* ❌ Remove icon */}
+            <button
+              onClick={() => handleRemove(item.id)}
+              className="absolute top-3 right-3 text-red-500 hover:text-red-700"
             >
-              {/* ❤️ Remove from wishlist */}
-              <div className="absolute top-4 right-4 z-10">
-                <div
-                  onClick={() => handleRemove(item.id)}
-                  className="flex items-center justify-center w-10 h-10 rounded-full bg-white text-xl shadow-md hover:shadow-lg cursor-pointer transition-all duration-300 text-red-500 hover:text-red-600"
+              <FaTrash size={20} />
+            </button>
+
+            {/* 📦 Left Image */}
+            <div className="w-full md:w-40 flex justify-center items-center">
+              <img
+                src={item.image}
+                alt={item.name}
+                className="w-32 h-32 object-contain cursor-pointer"
+                onClick={() => navigate(`/product/${item.id}`)}
+              />
+            </div>
+
+            {/* 📄 Right Details */}
+            <div className="flex flex-col md:ml-5 mt-3 md:mt-0 w-full">
+              {/* "Currently unavailable" */}
+              <p className="text-sm text-red-500 font-semibold mb-1">
+                Currently unavailable
+              </p>
+
+              {/* Title */}
+              <h3 className="text-lg font-bold text-gray-800 truncate">
+                {item.name}
+              </h3>
+
+              {/* Price */}
+              <p className="text-xl font-semibold text-gray-900 mt-1">
+                ₹ {item.price}
+              </p>
+
+              {/* Color */}
+              <p className="text-gray-500 text-sm">
+                {item.color || "Mixed"}
+              </p>
+
+              {/* Buttons */}
+              <div className="flex items-center gap-4 mt-3">
+                <button className="p-2 rounded-full border text-purple-600 hover:bg-purple-600 hover:text-white transition">
+                  <GiReturnArrow size={18} />
+                </button>
+
+                <button
+                  onClick={() => addToCart(item.id, item.price)}
+                  className="p-2 rounded-full border text-purple-600 hover:bg-purple-600 hover:text-white transition"
                 >
-                  <FaTrash />
-                </div>
-              </div>
+                  <FaShoppingCart size={18} />
+                </button>
 
-              {/* Image Section */}
-              <div className="relative overflow-hidden">
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  onClick={() => navigate(`/product/${item.id}`)} 
-                  className="w-full h-64 object-contain p-6 transition-transform duration-700 group-hover:scale-105"
-                />
-
-                {/* Hover Icons */}
-                <div className="absolute bottom-[-100px] group-hover:bottom-6 left-1/2 transform -translate-x-1/2 flex items-center gap-4 transition-all duration-700">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white text-[#9F2B68] hover:bg-[#9F2B68] hover:text-white text-xl shadow-md hover:shadow-lg cursor-pointer">
-                    <GiReturnArrow />
-                  </div>
-                  <div
-                    onClick={() => addToCart(item.id, item.price)}
-                    className="flex items-center justify-center w-10 h-10 rounded-full bg-white text-[#9F2B68] hover:bg-[#9F2B68] hover:text-white text-xl shadow-md hover:shadow-lg cursor-pointer"
-                  >
-                    <FaShoppingCart />
-                  </div>
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white text-[#9F2B68] hover:bg-[#9F2B68] hover:text-white text-xl shadow-md hover:shadow-lg cursor-pointer">
-                    <MdOutlineLabelImportant />
-                  </div>
-
-                </div>
-              </div>
-
-              {/* Info section */}
-              <div className="px-5 py-4 border-t flex flex-col gap-1">
-                <div className="flex items-center justify-between font-titleFont">
-                  <h3 className="text-lg font-bold text-primeColor truncate">
-                    {item.name}
-                  </h3>
-                  <p className="text-[#767676] text-[15px] font-medium">
-                    ₹ {item.price}
-                  </p>
-                </div>
-                <p className="text-[#767676] text-[14px]">
-                  {item.color || "Mixed"}
-                </p>
+                <button className="p-2 rounded-full border text-purple-600 hover:bg-purple-600 hover:text-white transition">
+                  <MdOutlineLabelImportant size={18} />
+                </button>
               </div>
             </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+);
+
 
 };
 

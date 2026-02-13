@@ -5,6 +5,7 @@ import { useCart } from "../../context/CartContext";
 
 import Breadcrumbs from "../../components/pageProps/Breadcrumbs";
 import { emptyCart } from "../../assets/images/index";
+import { toast } from "react-toastify";
 
 const Cart = () => {
   const navigate = useNavigate();
@@ -172,14 +173,24 @@ const Cart = () => {
 
               <div className="flex justify-end">
                 <button
-                  onClick={() =>
-                    navigate("/checkout", { state: { totalAmt, cart } })
-                  }
+                  onClick={() => {
+                    const token = localStorage.getItem("userToken");
+
+                    if (token) {
+                      // User is logged in → go to checkout
+                      navigate("/checkout", { state: { totalAmt, cart } });
+                    } else {
+                      // User NOT logged in → show toast and redirect
+                      toast.error("Please log in to proceed to checkout");
+                      navigate("/login");
+                    }
+                  }}
                   className="w-52 h-10 bg-primeColor text-white hover:bg-black duration-300 rounded-md"
                 >
                   Proceed to Checkout
                 </button>
               </div>
+
             </div>
           </div>
         </div>

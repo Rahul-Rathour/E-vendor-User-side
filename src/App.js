@@ -54,6 +54,7 @@ import PaymentCancelled from "./pages/PaymentCancelled/PaymentCancelled";
 import api from "./api";
 import { useEffect } from "react";
 import InvoicePage from "./pages/InvoicePage";
+import Faq from "./pages/Account/Faq";
 
 
 
@@ -68,7 +69,7 @@ const Layout = () => {
 
       <Outlet />
       <Footer />
-      <FooterBottom />
+      {/* <FooterBottom /> */}
       <BottomNav />
     </div>
   );
@@ -100,6 +101,7 @@ const router = createBrowserRouter(
         <Route path="/category/:id" element={<CategoryProducts />} />
         <Route path="/subcategory/:id" element={<SubcategoryProducts />} />
         <Route path="/search" element={<SearchResults />} />
+        <Route path="/faq" element={<Faq/>}/>
       </Route>
       <Route path="/product/:id" element={<ProductDetails />}></Route>
       <Route path="/signup" element={<SignUp />}></Route>

@@ -2,43 +2,46 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import api from "../api";
-import { FaShoppingCart } from "react-icons/fa";
-import { BsSuitHeartFill, BsSuitHeart } from "react-icons/bs";
-import { MdOutlineLabelImportant } from "react-icons/md";
-import { GiReturnArrow } from "react-icons/gi";
 import { toast } from "react-toastify";
-import Breadcrumbs from "./pageProps/Breadcrumbs";
 
-import ProductBanner from "./pageProps/shopPage/ProductBanner";
-import Pagination from "./pageProps/shopPage/Pagination";
+import Pagination from "../components/pageProps/shopPage/Pagination";
+import ProductBanner from "../components/pageProps/shopPage/ProductBanner";
+import ShopSideNav from "./pageProps/shopPage/ShopSideNav";
 
 const SubcategoryProducts = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const { addToCart } = useCart();
- 
-  const [products, setProducts] = useState([]);
-  const [activeWishlist, setActiveWishlist] = useState([]);
-  const [itemsPerPage, setItemsPerPage] = useState(12); 
-  const [sortedProducts, setSortedProducts] = useState([]); 
 
-  // ===========================================================================================
-  // Fetch products under selected subcategory
-  // ===========================================================================================
+  const [products, setProducts] = useState([]);
+  const [itemsPerPage, setItemsPerPage] = useState(12);
+  const [activeWishlist, setActiveWishlist] = useState([]);
+  const [sortedProducts, setSortedProducts] = useState([]);
+
+  // NEW → for mobile filter drawer
+  const [showFilter, setShowFilter] = useState(false);
+
+  // Fetch Category Products
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const res = await api.get(`/subcategories/${id}/products`);
         setProducts(res.data.data || []);
-        setSortedProducts(res.data.data);
+        setSortedProducts(res.data.data || []);
       } catch (err) {
-        console.error("Error fetching subcategory products:", err);
+        console.log(err);
       }
     };
+
     fetchProducts();
   }, [id]);
 
-   // Sorting function
+  // Items Per Page Handler
+  const itemsPerPageFromBanner = (value) => {
+    setItemsPerPage(value);
+  };
+
+  // SORTING FUNCTION
   const handleSort = (type) => {
     let sorted = [...products];
 
@@ -54,19 +57,30 @@ const SubcategoryProducts = () => {
       case "Final Offer":
         sorted = sorted.filter((p) => p.product_type === "hot_deal");
         break;
-        
 
       default:
-        sorted = sorted.filter((p) => p.product_type === "none");
+        sorted = [...products];
         break;
     }
 
     setSortedProducts(sorted);
   };
 
-  // ===========================================================================================
-  // Wishlist Handler
-  // ===========================================================================================
+  // PRICE FILTER HANDLER DESKTOP
+  const handlePriceFilter = (min, max) => {
+    const filtered = products.filter(
+      (p) => p.price >= min && p.price <= max
+    );
+    setSortedProducts(filtered);
+  };
+
+  // MOBILE FILTER HANDLER (auto-close drawer)
+  const handleMobilePriceFilter = (min, max) => {
+    handlePriceFilter(min, max);
+    setShowFilter(false);
+  };
+
+  // Wishlist Logic
   const handleAddToWishlist = async (productId) => {
     const user = JSON.parse(localStorage.getItem("user"));
     if (!user) {
@@ -82,119 +96,81 @@ const SubcategoryProducts = () => {
 
       if (res.data.status) {
         toast.success(res.data.message || "Added to wishlist ❤️");
+        setActiveWishlist((prev) => [...prev, productId]);
       } else {
         toast.info(res.data.message || "Already in wishlist");
+        setActiveWishlist((prev) =>
+          prev.includes(productId) ? prev : [...prev, productId]
+        );
       }
-
-      setActiveWishlist((prev) =>
-        prev.includes(productId) ? prev : [...prev, productId]
-      );
     } catch (err) {
-      console.error(err);
       toast.error("Something went wrong while adding to wishlist");
     }
   };
 
-  // ===========================================================================================
-  // Items per page from ProductBanner
-  // ===========================================================================================
-  const itemsPerPageFromBanner = (value) => {
-    setItemsPerPage(value);
-  };
+  return (
+    <div className="max-w-container mx-auto px-4 py-8">
 
-  // ===========================================================================================
-  // Custom Product card - used by Pagination
-  // ===========================================================================================
-  const ProductCard = ({ prod }) => (
-    <div
-      key={prod.id}
-      className="w-full relative group bg-white border rounded-md overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300"
-    >
-      {/* ❤️ Wishlist button */}
-      <div className="absolute top-4 right-4 z-10">
-        <div
-          onClick={() => handleAddToWishlist(prod.id)}
-          className={`flex items-center justify-center w-10 h-10 rounded-full bg-white text-xl shadow-md hover:shadow-lg cursor-pointer transition-all duration-300 ${
-            activeWishlist.includes(prod.id)
-              ? "text-brandColor"
-              : "text-gray-400 hover:text-brandColor"
-          }`}
-        >
-          {activeWishlist.includes(prod.id) ? (
-            <BsSuitHeartFill />
+      <div className="w-full h-full flex pb-20 gap-10">
+
+        {/* DESKTOP SIDEBAR */}
+        <div className="w-[20%] lgl:w-[25%] hidden mdl:inline-flex h-full">
+          <ShopSideNav onPriceSelect={handlePriceFilter} />
+        </div>
+
+        {/* RIGHT CONTENT */}
+        <div className="w-full mdl:w-[80%] lgl:w-[75%] h-full flex flex-col gap-10">
+          
+          {/* PRODUCT BANNER (Mobile Filter Button Inside) */}
+          <ProductBanner
+            itemsPerPageFromBanner={itemsPerPageFromBanner}
+            sortHandler={handleSort}
+            onMobileFilterOpen={() => setShowFilter(true)}
+          />
+
+          {/* PRODUCT LIST */}
+          {products.length === 0 ? (
+            <p className="text-center text-gray-500 mt-10">
+              No products found in this category.
+            </p>
           ) : (
-            <BsSuitHeart />
+            <Pagination
+              items={sortedProducts}
+              itemsPerPage={itemsPerPage}
+              wishlistHandler={handleAddToWishlist}
+              activeWishlist={activeWishlist}
+              addToCart={addToCart}
+              navigate={navigate}
+              cardType="CATEGORY"
+            />
           )}
         </div>
       </div>
 
-      {/* Image */}
-      <div className="relative overflow-hidden">
-        {prod.is_new && (
-          <span className="absolute top-4 left-4 bg-brandColor text-white text-sm px-3 py-1 rounded-md font-medium">
-            New
-          </span>
-        )}
-        <img
-          src={
-            prod.image
-              ? `${process.env.REACT_APP_API_URL}/public/${prod.image}`
-              : "/placeholder.jpg"
-          }
-          alt={prod.name}
-          onClick={() => navigate(`/product/${prod.id}`)}
-          className="w-full h-64 object-contain p-6 transition-transform duration-700 group-hover:scale-105"
-        />
+      {/* MOBILE FILTER DRAWER */}
+      {showFilter && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 z-50 mdl:hidden">
+          <div className="absolute bottom-0 left-0 w-full bg-white shadow-xl rounded-t-xl p-5 h-[70%] overflow-y-auto">
 
-        {/* Hover Icons */}
-        <div className="absolute bottom-[-100px] group-hover:bottom-6 left-1/2 transform -translate-x-1/2 flex items-center gap-4 transition-all duration-700">
-          <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white text-brandColor hover:bg-brandColor hover:text-white text-xl shadow-md hover:shadow-lg cursor-pointer">
-            <GiReturnArrow />
-          </div>
+            {/* Drawer Header */}
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold">Filters</h2>
+              <button
+                onClick={() => setShowFilter(false)}
+                className="text-red-500 text-2xl"
+              >
+                ✕
+              </button>
+            </div>
 
-          <div
-            onClick={() => addToCart(prod.id, prod.price)}
-            className="flex items-center justify-center w-10 h-10 rounded-full bg-white text-brandColor hover:bg-brandColor hover:text-white text-xl shadow-md hover:shadow-lg cursor-pointer"
-          >
-            <FaShoppingCart />
-          </div>
-
-          <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white text-brandColor hover:bg-brandColor hover:text-white text-xl shadow-md hover:shadow-lg cursor-pointer">
-            <MdOutlineLabelImportant />
+            {/* Mobile Filters (auto close) */} 
+            <ShopSideNav onPriceSelect={handleMobilePriceFilter} />
           </div>
         </div>
-      </div>
+      )}
 
-      {/* Info */}
-      <div className="px-5 py-4 border-t flex flex-col gap-1">
-        <div className="flex items-center justify-between font-titleFont">
-          <h3 className="text-lg font-bold text-primeColor truncate">
-            {prod.name}
-          </h3>
-          <p className="text-[#767676] text-[15px] font-medium">₹ {prod.price}</p>
-        </div>
-        <p className="text-[#767676] text-[14px]">{prod.color || "Mixed"}</p>
-      </div>
     </div>
   );
-
-  return (
-    <div className="max-w-container mx-auto px-4 py-8">
-      <Breadcrumbs title="Products" />
-
-      {/* Filter bar same as Shop page */}
-      <ProductBanner itemsPerPageFromBanner={itemsPerPageFromBanner} 
-      sortHandler={handleSort}
-      />
-
-      {/* Pagination Component - SAME AS SHOP COMPONENT */}
-      <Pagination
-        items={sortedProducts.map((p) => ({ ...p, Component: ProductCard }))}
-        itemsPerPage={itemsPerPage}
-        customCard={(item) => <ProductCard prod={item} />}
-      />
-    </div>
-  );
-}; 
+};
 
 export default SubcategoryProducts;

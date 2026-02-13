@@ -27,6 +27,7 @@ const ProductInfo = ({ productInfo }) => {
     <div className="flex flex-col gap-5">
       <h6 className="text-2xl font-semibold text-brandColor">{productInfo.name}</h6>
       <p className="text-xl font-semibold">₹ {productInfo.price}</p>
+      <p className="text-xl font-semibold">About this item</p>
       <p className="text-base text-brandColor">{productInfo.description}</p>
       <p className="text-sm">Be the first to leave a review.</p>
       <p className="font-medium text-lg">

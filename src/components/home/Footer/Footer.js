@@ -1,7 +1,24 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FaFacebook, FaYoutube, FaInstagram, FaTwitter } from "react-icons/fa";
+import api from "../../../api";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
+  const [siteTitle, setSiteTitle] = useState("");
+  const [address, setAddress] = useState("");
+
+  useEffect(() => {
+    api.get("/home-setting")
+      .then(res => {
+        if (res.data?.title) {
+          setSiteTitle(res.data.title);   // Save title in state
+          setAddress(res.data.address);
+        }
+      })
+      .catch(err => {
+        console.error("Footer home-setting error:", err);
+      });
+  }, []);
   return (
     <footer className="w-full bg-[#131921] text-gray-300 pt-10 pb-6">
       <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 px-6">
@@ -20,7 +37,7 @@ const Footer = () => {
         </div>
 
         {/* Group Companies */}
-       
+
 
         {/* Help */}
         <div>
@@ -29,7 +46,9 @@ const Footer = () => {
             <li>Payments</li>
             <li>Shipping</li>
             <li>Cancellation & Returns</li>
-            <li>FAQ</li>
+            <Link to={'/faq'}>
+              <li>FAQ</li>
+            </Link>
           </ul>
         </div>
 
@@ -65,14 +84,8 @@ const Footer = () => {
         <div className="col-span-2 md:col-span-2 lg:col-span-1">
           <h3 className="text-white font-semibold mb-3">Registered Office Address:</h3>
           <p className="text-sm leading-6">
-            DOceanr Shopping Private Limited,<br />
-            Buildings Alyssa, Begonia &<br />
-            Clove Embassy Tech Village,<br />
-            Outer Ring Road, Devarabeesanahalli Village,<br />
-            Bengaluru, 560103,<br />
-            Karnataka, India<br />
-            CIN : U51109KA2012PTC066107<br />
-            Telephone: 044-45614700 / 044-67415800
+            {siteTitle}<br />
+            {address}<br />
           </p>
         </div>
       </div>
@@ -90,9 +103,9 @@ const Footer = () => {
 
       {/* Bottom strip */}
       <div className="text-center text-gray-400 text-xs mt-4">
-        © 2007–2026 DOceanr.com
+        © 2007–2026 {siteTitle}
       </div>
-    </footer>
+    </footer >
   );
 };
 

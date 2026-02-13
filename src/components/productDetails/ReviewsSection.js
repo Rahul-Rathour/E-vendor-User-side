@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const ReviewsSection = ({ reviews }) => {
+const ReviewsSection = ({ reviews }) => { 
   const [showAll, setShowAll] = useState(false);
 
   const limit = 3; // Number of reviews to show initially

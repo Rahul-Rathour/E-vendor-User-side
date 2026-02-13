@@ -27,7 +27,7 @@ const Product = (props) => {
   const productItem = props;
   const handleProductDetails = () => {
     navigate(`/product/${props._id}`, {
-    state: { product: productItem },
+      state: { product: productItem },
     });
   };
   //  Handle Add to Wishlist
@@ -62,14 +62,14 @@ const Product = (props) => {
   }
 
   return (
-    <div className="w-full relative group overflow-hidden bg-slate-50">
+    <div className="w-full relative group overflow-hidden hover:bg-slate-50">
       {/* <div className="max-w-80 max-h-80 relative overflow-y-hidden "> */}
       <div className="w-60 h-64 relative overflow-hidden flex items-center justify-center">
         <div onClick={handleProductDetails} className="cursor-pointer">
           <Image className="w-full h-full" imgSrc={props.img} />
         </div>
-        <div className="absolute top-6 left-8"> 
-          {props.badge && <Badge text={props.badge_text} />} 
+        <div className="absolute top-6 left-8">
+          {props.badge && <Badge text={props.badge_text} />}
         </div>
         <div className="w-full h-32 absolute -bottom-[130px] group-hover:bottom-0 duration-700 flex items-center justify-center">
           <ul className="flex items-center justify-center gap-4 font-titleFont">
@@ -104,22 +104,30 @@ const Product = (props) => {
                 <BsSuitHeart />
               )}
             </li>
-          </ul>
+          </ul> 
         </div>
       </div>
-      <div className="max-w-80 py-6 flex flex-col gap-1 border-[1px] border-t-0 px-4">
-        <div className="flex items-center justify-between font-titleFont">
-          <h2 className="text-lg text-primeColor font-bold">
-            {props.productName}
-          </h2>
-          <p className="text-[#767676] text-[14px]"> ₹ {props.price}</p>
-        </div> 
-        <div> 
-          <p className="text-[#767676] text-[14px]">{props.color}</p>
-        </div>
+
+      <div className="max-w-80 py-4 flex flex-col gap-1 px-4">
+
+        {/* Product Name (2 lines max) */}
+        <h2 className="text-[15px] font-semibold text-gray-900 line-clamp-2 leading-tight">
+          {props.productName}
+        </h2>
+
+        {/* Description (2 lines max) */}
+        <p className="text-[13px] text-gray-600 line-clamp-2 leading-snug">
+          {props.des}
+        </p>
+
+        {/* Price */}
+        <p className="text-[17px] font-bold mt-1">
+          ₹ {props.price}
+        </p>
       </div>
+
     </div>
   );
-};
+}; 
 
 export default Product;
