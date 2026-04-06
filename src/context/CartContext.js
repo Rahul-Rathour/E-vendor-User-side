@@ -144,7 +144,7 @@ export const CartProvider = ({ children }) => {
         addToCart,
         removeFromCart,
         updateQuantity,
-        checkout,
+        checkout, 
         fetchCart,
         refreshToken,
       }}

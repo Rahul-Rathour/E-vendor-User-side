@@ -22,6 +22,7 @@ const Login = () => {
         localStorage.setItem('userToken', res.data.token); 
         refreshToken();
         localStorage.setItem('user', JSON.stringify(res.data.user)); 
+        localStorage.setItem('orderType', "general_price"); 
         navigate('/');
       }
       else {

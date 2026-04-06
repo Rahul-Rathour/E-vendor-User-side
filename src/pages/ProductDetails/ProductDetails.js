@@ -23,6 +23,7 @@ const ProductDetails = () => {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
 
+const [order_type, setOrder_type] = useState();
   // NEW: Stores selected media (image or video)
   const [selectedMedia, setSelectedMedia] = useState(null);
 
@@ -33,7 +34,7 @@ const ProductDetails = () => {
 
   useEffect(() => {
     setPrevLocation(location.pathname);
-
+    setOrder_type(localStorage.getItem('orderType') || "general_price");
     const fetchProduct = async () => {
       try {
         const res = await api.get(`/product/${id}`);
@@ -167,7 +168,7 @@ const ProductDetails = () => {
 
               {/* RIGHT — Product Info */}
               <div className="w-full md:col-span-2 xl:col-span-3 xl:p-14 flex flex-col gap-6 order-3">
-                <ProductInfo productInfo={productInfo} />
+                <ProductInfo productInfo={productInfo} order_type={order_type}/>
               </div>
             </div>
 

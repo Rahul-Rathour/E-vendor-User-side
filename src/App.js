@@ -4,7 +4,7 @@ import "react-toastify/dist/ReactToastify.css";
 import {
   RouterProvider,
   Outlet,
-  createRoutesFromElements,
+  createRoutesFromElements, 
   Route,
   ScrollRestoration,
   createBrowserRouter,
@@ -126,7 +126,7 @@ const router = createBrowserRouter(
         <Route path="order" element={<Myorder />} />
         <Route path="review" element={<Review />} />
       </Route>
-
+ 
     </Route>
 
   )

@@ -2,28 +2,33 @@ import React, { useState } from "react";
 import ReactPaginate from "react-paginate";
 import Product from "../../home/Products/Product";
 
-function Items({ currentItems }) {
+function Items({ currentItems, orderType }) {
   return (
     <>
       {currentItems &&
-        currentItems.map((item) => (
-          <div key={item.id} className="w-full">
-            <Product
-              _id={item.id}
-              img={`${process.env.REACT_APP_API_URL}/public/${item.image}`}
-              productName={item.name}
-              price={item.price}
-              color=""
-              badge=""
-              des={item.description}
-            />
-          </div>
-        ))}
+        currentItems.map((item) => {
+          const priceToShow = item[orderType]; 
+          // Example: item["general_price"] OR item["wholesale_price"]
+
+          return (
+            <div key={item.id} className="w-full">
+              <Product
+                _id={item.id}
+                img={`${process.env.REACT_APP_API_URL}/public/${item.image}`}
+                productName={item.name}
+                price={priceToShow}       // 👈 send correct price
+                color=""
+                badge=""
+                des={item.description}
+              />
+            </div>
+          );
+        })}
     </>
   );
 }
 
-const Pagination = ({ items, itemsPerPage }) => {
+const Pagination = ({ items, itemsPerPage, orderType}) => {
   const [itemOffset, setItemOffset] = useState(0);
   const [itemStart, setItemStart] = useState(1);
 
@@ -42,7 +47,7 @@ const Pagination = ({ items, itemsPerPage }) => {
     <div>
       {/* PRODUCT GRID - SAME DESIGN */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10 mdl:gap-4 lg:gap-10">
-        <Items currentItems={currentItems} />
+        <Items currentItems={currentItems} orderType={orderType}/>
       </div>
 
       {/* PAGINATION SECTION - SAME DESIGN */}

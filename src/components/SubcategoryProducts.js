@@ -17,6 +17,7 @@ const SubcategoryProducts = () => {
   const [itemsPerPage, setItemsPerPage] = useState(12);
   const [activeWishlist, setActiveWishlist] = useState([]);
   const [sortedProducts, setSortedProducts] = useState([]);
+  const [order_type, setOrder_type] = useState();
 
   // NEW → for mobile filter drawer
   const [showFilter, setShowFilter] = useState(false);
@@ -27,6 +28,7 @@ const SubcategoryProducts = () => {
       try {
         const res = await api.get(`/subcategories/${id}/products`);
         setProducts(res.data.data || []);
+        setOrder_type(localStorage.getItem('orderType') || "general_price");
         setSortedProducts(res.data.data || []);
       } catch (err) {
         console.log(err);
@@ -69,7 +71,7 @@ const SubcategoryProducts = () => {
   // PRICE FILTER HANDLER DESKTOP
   const handlePriceFilter = (min, max) => {
     const filtered = products.filter(
-      (p) => p.price >= min && p.price <= max
+      (p) => p.order_type >= min && p.order_type <= max
     );
     setSortedProducts(filtered);
   };
@@ -138,6 +140,7 @@ const SubcategoryProducts = () => {
               items={sortedProducts}
               itemsPerPage={itemsPerPage}
               wishlistHandler={handleAddToWishlist}
+              orderType={order_type}   // ← Pass it here
               activeWishlist={activeWishlist}
               addToCart={addToCart}
               navigate={navigate}

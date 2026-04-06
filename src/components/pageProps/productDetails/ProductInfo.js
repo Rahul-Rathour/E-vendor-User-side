@@ -2,7 +2,7 @@ import React from "react";
 import { useDispatch } from "react-redux";
 import { useCart } from "../../../context/CartContext";
 
-const ProductInfo = ({ productInfo }) => {
+const ProductInfo = ({ productInfo, order_type}) => {
   const { addToCart } = useCart();
   const dispatch = useDispatch();
 
@@ -25,8 +25,9 @@ const ProductInfo = ({ productInfo }) => {
 
   return (
     <div className="flex flex-col gap-5">
+      {/* <h6>{order_type}</h6> */}
       <h6 className="text-2xl font-semibold text-brandColor">{productInfo.name}</h6>
-      <p className="text-xl font-semibold">₹ {productInfo.price}</p>
+      <p className="text-xl font-semibold">₹ {productInfo[order_type]}</p>
       <p className="text-xl font-semibold">About this item</p>
       <p className="text-base text-brandColor">{productInfo.description}</p>
       <p className="text-sm">Be the first to leave a review.</p>

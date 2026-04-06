@@ -69,7 +69,18 @@ const Header = () => {
     recognitionRef.current.start();
   };
 
+  const toggleOrderType = () => {
+    const current = localStorage.getItem("orderType") || "general_price";
 
+    const next = current === "general_price"
+      ? "wholesale_price"
+      : "general_price";
+
+    localStorage.setItem("orderType", next);
+
+    setSidenav(false);
+    window.location.reload(); // optional: refresh UI to apply change globally
+  };
 
 
   const handleLogout = () => {
@@ -251,7 +262,7 @@ const Header = () => {
                         item.image
                           ? `${process.env.REACT_APP_API_URL}/public/${item.image}`
                           : "/placeholder.jpg"
-                      } 
+                      }
                       alt={item.image}
                       className="w-10 h-10 object-cover"
                     />
@@ -378,6 +389,18 @@ const Header = () => {
               >
                 <FaUser className="text-gray-700" />
                 <span>My Profile</span>
+              </button>
+              <button
+                onClick={toggleOrderType}
+                className="flex items-center gap-3 p-2 border rounded hover:bg-gray-100"
+              >
+                <FaUser className="text-gray-700" />
+
+                <span>
+                  {localStorage.getItem("orderType") === "wholesale_price"
+                    ? "Switch to General Order"
+                    : "Switch to Bulk Order"}
+                </span>
               </button>
 
             </div>

@@ -20,6 +20,7 @@ const CategoryProducts = () => {
 
   // NEW → for mobile filter drawer
   const [showFilter, setShowFilter] = useState(false);
+  const [order_type, setOrder_type] = useState();
 
   // Fetch Category Products
   useEffect(() => {
@@ -27,6 +28,7 @@ const CategoryProducts = () => {
       try {
         const res = await api.get(`/categories/${id}/products`);
         setProducts(res.data.products || []);
+        setOrder_type(localStorage.getItem('orderType') || "general_price");
         setSortedProducts(res.data.products || []);
       } catch (err) {
         console.log(err);
@@ -69,7 +71,7 @@ const CategoryProducts = () => {
   // PRICE FILTER HANDLER DESKTOP
   const handlePriceFilter = (min, max) => {
     const filtered = products.filter(
-      (p) => p.price >= min && p.price <= max
+      (p) => p[order_type] >= min && p[order_type] <= max
     );
     setSortedProducts(filtered);
   };
@@ -137,6 +139,7 @@ const CategoryProducts = () => {
             <Pagination
               items={sortedProducts}
               itemsPerPage={itemsPerPage}
+              orderType={order_type}   // ← Pass it here
               wishlistHandler={handleAddToWishlist}
               activeWishlist={activeWishlist}
               addToCart={addToCart}

@@ -12,6 +12,7 @@ const Logout = () => {
     // Clear user-related data here (like localStorage, Redux, etc.) 
     localStorage.removeItem('userToken');
     localStorage.removeItem('user');
+    localStorage.removeItem('orderType');
     
     // Redirect to home or login after 3 seconds 
     const timer = setTimeout(() => {
