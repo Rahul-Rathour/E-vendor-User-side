@@ -4,7 +4,7 @@ import "react-toastify/dist/ReactToastify.css";
 import {
   RouterProvider,
   Outlet,
-  createRoutesFromElements, 
+  createRoutesFromElements,
   Route,
   ScrollRestoration,
   createBrowserRouter,
@@ -31,7 +31,7 @@ import ProductDetails from "./pages/ProductDetails/ProductDetails";
 import Shop from "./pages/Shop/Shop";
 import Login from "./pages/Account/Login";
 import Wishlist from "./pages/Cart/Wishlist";
-import Myprofile from "./pages/Account/Myprofile"; 
+import Myprofile from "./pages/Account/Myprofile";
 import ManageAddress from "./pages/Account/ManageAddress";
 import AccountLayout from "./pages/Account/AccountLayout";
 import Myorder from "./pages/Account/Myorder";
@@ -91,9 +91,9 @@ const router = createBrowserRouter(
         <Route path="/productFilte" element={<ProductFilter />}></Route>
         {/* ==================== Header Navlink End here ===================== */}
         <Route path="/offer" element={<Offer />}></Route>
-        
+
         <Route path="/cart" element={<Cart />}></Route>
-        <Route path="/invoice" element={<InvoicePage/>}></Route>
+        <Route path="/invoice" element={<InvoicePage />}></Route>
         <Route path="/wishlist" element={<Wishlist />}></Route>
         <Route path="/paymentgateway" element={<Payment />}></Route>
         <Route path="/profile" element={<Myprofile />} />
@@ -101,7 +101,8 @@ const router = createBrowserRouter(
         <Route path="/category/:id" element={<CategoryProducts />} />
         <Route path="/subcategory/:id" element={<SubcategoryProducts />} />
         <Route path="/search" element={<SearchResults />} />
-        <Route path="/faq" element={<Faq/>}/>
+        <Route path="/faq" element={<Faq />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
       </Route>
       <Route path="/product/:id" element={<ProductDetails />}></Route>
       <Route path="/signup" element={<SignUp />}></Route>
@@ -112,7 +113,6 @@ const router = createBrowserRouter(
       <Route path="/mobile-account" element={<MobileAccount />} />
       <Route path="/review" element={<Review />} />
       <Route path="/logout" element={<Logout />} />
-      <Route path="/checkout" element={<CheckoutPage />} />
       <Route path="/orderSuccess" element={<OrderSuccess />} />
       <Route path="/paymentFailed" element={<PaymentFailed />} />
       <Route path="/razorpay" element={<RazorpayPayment />} />
@@ -126,7 +126,7 @@ const router = createBrowserRouter(
         <Route path="order" element={<Myorder />} />
         <Route path="review" element={<Review />} />
       </Route>
- 
+
     </Route>
 
   )

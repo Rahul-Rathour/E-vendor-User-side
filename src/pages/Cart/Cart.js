@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useCart } from "../../context/CartContext";
+import api from "../../api";
 
 import Breadcrumbs from "../../components/pageProps/Breadcrumbs";
 import { emptyCart } from "../../assets/images/index";
@@ -12,11 +13,23 @@ const Cart = () => {
   const { cart, removeFromCart, updateQuantity } = useCart();
 
   const [totalAmt, setTotalAmt] = useState(0);
+  const [coupons, setCoupons] = useState();
+  const [selectedCoupon, setSelectedCoupon] = useState(null);
+  const [discountAmount, setDiscountAmount] = useState(0);
   const [gstToggle, setGstToggle] = useState({});
+  const finalTotal = totalAmt - discountAmount;
 
   const toggleGST = (id) => {
     setGstToggle((prev) => ({ ...prev, [id]: !prev[id] }));
   };
+
+  useEffect(() => {
+    api.get("/coupons")
+      .then((res) => {
+        setCoupons(res.data);
+      })
+      .catch(() => toast.error("Failed to load coupons"));
+  }, []);
 
   // Calculate total with GST included
   useEffect(() => {
@@ -30,6 +43,32 @@ const Cart = () => {
 
     setTotalAmt(total);
   }, [cart]);
+
+  const applyCoupon = (coupon) => {
+    if (!coupon) return;
+
+    if (totalAmt < parseFloat(coupon.min_cart_amount)) {
+      toast.error(`Minimum cart amount ₹${coupon.min_cart_amount} required`);
+      return;
+    }
+
+    let discount = 0;
+
+    if (coupon.discount_type === "percentage") {
+      discount = (totalAmt * coupon.discount_value) / 100;
+
+      if (discount > coupon.max_discount) {
+        discount = coupon.max_discount;
+      }
+    } else if (coupon.discount_type === "flat") {
+      discount = coupon.discount_value;
+    }
+
+    setSelectedCoupon(coupon);
+    setDiscountAmount(discount);
+
+    toast.success(`Coupon "${coupon.code}" applied successfully!`);
+  };
 
   const calculateGSTAmount = (item) => {
     const price = item.product.price * item.quantity;
@@ -74,7 +113,9 @@ const Cart = () => {
                       {item.product.name}
                     </h3>
                     <p className="text-gray-500 text-sm">
-                      ₹{item.product.price}
+                      <span className="text-gray-500">Size:</span> <span className="font-semibold p-1 bg-gray-100 rounded-lg">{item.size || "N/A"}</span>
+                      <span className="text-gray-500">Color:</span> <span className="font-semibold p-1 rounded-lg"
+                        style={{ color: item.color?.color_code || "#ccc" }}>{item.color?.color_name}</span>
                     </p>
 
                     {/* GST Toggle */}
@@ -103,7 +144,7 @@ const Cart = () => {
                 </p>
 
                 {/* Quantity Controls */}
-                <div className="flex items-center justify-center">
+                <div className="flex items-center ">
                   <button
                     onClick={() =>
                       updateQuantity(item.id, Math.max(1, item.quantity - 1))
@@ -124,7 +165,7 @@ const Cart = () => {
                 </div>
 
                 {/* Subtotal */}
-                <div className="flex flex-col items-center gap-2">
+                <div className="flex flex-col items-start gap-2">
                   <p className="font-semibold">
                     ₹
                     {(
@@ -163,10 +204,41 @@ const Cart = () => {
                   </span>
                 </p>
 
+                {/* Coupon Section */}
+                <div className="mt-4">
+                  <label className="font-semibold">Apply Coupon</label>
+                  <select
+                    className="w-full mt-1 p-2 border rounded"
+                    onChange={(e) => {
+                      const coupon = coupons?.find(c => c.id == e.target.value);
+                      applyCoupon(coupon);
+                    }}
+                  >
+                    <option value="">Select Coupon</option>
+
+                    {coupons?.map((c) =>
+                      totalAmt >= parseFloat(c.min_cart_amount) ? (
+                        <option key={c.id} value={c.id}>
+                          {c.code} — {c.discount_type === "percentage"
+                            ? `${c.discount_value}% OFF`
+                            : `Flat ₹${c.discount_value}`
+                          }
+                        </option>
+                      ) : null
+                    )}
+                  </select>
+
+                  {selectedCoupon && (
+                    <p className="text-green-600 mt-2 text-sm">
+                      Applied: <strong>{selectedCoupon.code}</strong> — Discount ₹{discountAmount.toFixed(2)}
+                    </p>
+                  )}
+                </div>
+
                 <p className="flex items-center justify-between py-1.5 text-lg px-2 font-bold text-primeColor">
                   Grand Total
                   <span className="font-bold tracking-wide text-lg font-titleFont">
-                    ₹{totalAmt.toFixed(2)}
+                    ₹{(totalAmt - discountAmount).toFixed(2)}
                   </span>
                 </p>
               </div>
@@ -178,7 +250,15 @@ const Cart = () => {
 
                     if (token) {
                       // User is logged in → go to checkout
-                      navigate("/checkout", { state: { totalAmt, cart } });
+                      navigate("/checkout", {
+                        state: {
+                          totalAmt, // original total
+                          finalTotal: totalAmt - discountAmount,
+                          cart,
+                          discountAmount,
+                          selectedCoupon
+                        }
+                      });
                     } else {
                       // User NOT logged in → show toast and redirect
                       toast.error("Please log in to proceed to checkout");

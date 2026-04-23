@@ -14,34 +14,32 @@ const ProductDetails = () => {
   const { id } = useParams();
   const location = useLocation();
 
-  const [prevLocation, setPrevLocation] = useState("");
   const [productInfo, setProductInfo] = useState(null);
   const [loading, setLoading] = useState(true);
-
   const [reviews, setReviews] = useState([]);
-  const [loadingReviews, setLoadingReviews] = useState(true);
-  const [rating, setRating] = useState(5);
+  const [similarProducts, setSimilarProducts] = useState([]);
   const [comment, setComment] = useState("");
+  const [rating, setRating] = useState(5);
+  const [loadingReviews, setLoadingReviews] = useState(true);
 
-const [order_type, setOrder_type] = useState();
-  // NEW: Stores selected media (image or video)
+
+  // New States for Selection
+  const [selectedColor, setSelectedColor] = useState(null);
+  const [selectedSize, setSelectedSize] = useState(null);
   const [selectedMedia, setSelectedMedia] = useState(null);
 
-  const [similarProducts, setSimilarProducts] = useState([]);
-
-
-
-
   useEffect(() => {
-    setPrevLocation(location.pathname);
-    setOrder_type(localStorage.getItem('orderType') || "general_price");
     const fetchProduct = async () => {
       try {
         const res = await api.get(`/product/${id}`);
         if (res.data.status) {
-          setProductInfo(res.data.data);
-        } else {
-          setProductInfo(null);
+          const product = res.data.data;
+          setProductInfo(product);
+
+          // Set default color (first color)
+          if (product.colors?.length > 0) {
+            setSelectedColor(product.colors[0]);
+          }
         }
       } catch (error) {
         console.error("Error fetching product:", error);
@@ -51,8 +49,7 @@ const [order_type, setOrder_type] = useState();
     };
 
     fetchProduct();
-    fetchReviews();
-  }, [id, location.pathname]);
+  }, [id]);
 
   useEffect(() => {
     if (productInfo?.category_id) {
@@ -68,15 +65,20 @@ const [order_type, setOrder_type] = useState();
       fetchSimilar();
     }
   }, [productInfo]);
-  // Set default media to main image after loading product
+
+  // Update selected media when color changes
   useEffect(() => {
-    if (productInfo) {
-      setSelectedMedia({
-        type: "image",
-        value: productInfo.image
-      });
+    if (selectedColor) {
+      if (selectedColor.images?.length > 0) {
+        setSelectedMedia({
+          type: "image",
+          value: selectedColor.images[0].image_path,
+        });
+      } else if (productInfo?.image) {
+        setSelectedMedia({ type: "image", value: productInfo.image });
+      }
     }
-  }, [productInfo]);
+  }, [selectedColor, productInfo]);
 
   // ⭐ Fetch reviews
   const fetchReviews = async () => {
@@ -110,139 +112,130 @@ const [order_type, setOrder_type] = useState();
     }
   };
 
-  if (loading)
-    return (
-      <div className="flex justify-center items-center h-[60vh] text-gray-500 text-lg">
-        Loading product details...
-      </div>
-    );
+  // Filter sizes for selected color
+  const availableSizes = productInfo?.sizes?.filter(
+    (size) => size.product_color_id === selectedColor?.id
+  ) || [];
 
-  if (!productInfo)
-    return (
-      <div className="text-center mt-20 text-xl font-medium text-red-500">
-        Product not found!
-      </div>
-    );
+  if (loading) return <div className="flex justify-center items-center h-[60vh]">Loading...</div>;
+  if (!productInfo) return <div>Product not found!</div>;
 
   return (
     <>
       <HeaderCopy />
-      <SpecialCase/>
+      <SpecialCase />
       <div className="p-4">
-        <div className="w-full mx-auto border-b border-gray-300 bg-white">
-          <div className="max-w-container mx-auto px-4">
-            <div className="xl:-mt-10 -mt-7">
-              <Breadcrumbs title={""} prevLocation={prevLocation} />
+        <div className="max-w-container mx-auto px-4">
+          <Breadcrumbs title={productInfo.name} prevLocation={location.pathname} />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-6 gap-6 mt-6">
+
+            {/* Thumbnails */}
+            <div className="lg:sticky lg:top-20">
+              <ProductThumbnails
+                productInfo={productInfo}
+                selectedColor={selectedColor}
+                setSelectedMedia={setSelectedMedia}
+              />
             </div>
 
-            <div className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-6 gap-4 h-full -mt-5 xl:-mt-8 pb-10 bg-gray-100 p-4 rounded-lg">
-
-              {/* LEFT — Thumbnails */}
-              <div className="order-2 md:order-1 lg:sticky lg:top-20 max-h-[85vh] overflow-y-auto">
-                <ProductThumbnails
-                  productInfo={productInfo}
-                  setSelectedMedia={setSelectedMedia}
-                />
-              </div>
-
-              {/* CENTER — Main Media */}
-              <div className="xl:col-span-2 flex justify-center items-start order-1 md:order-2 lg:sticky lg:top-20 max-h-[85vh]">
-                <div className="w-full h-full rounded-md shadow-md overflow-hidden">
-
-                  {selectedMedia?.type === "image" && (
-                    <ZoomImage
-                      src={`${process.env.REACT_APP_API_URL}/public/${selectedMedia.value}`}
-                    />
-                  )}
-
-                  {selectedMedia?.type === "video" && (
-                    <iframe
-                      className="w-full h-full rounded-md"
-                      src={`https://www.youtube.com/embed/${selectedMedia.value}`}
-                      allowFullScreen
-                    ></iframe>
-                  )}
-
-                </div>
-              </div>
-
-              {/* RIGHT — Product Info */}
-              <div className="w-full md:col-span-2 xl:col-span-3 xl:p-14 flex flex-col gap-6 order-3">
-                <ProductInfo productInfo={productInfo} order_type={order_type}/>
+            {/* Main Image / Video */}
+            <div className="xl:col-span-2 flex justify-center lg:sticky lg:top-20">
+              <div className="w-full aspect-square bg-white rounded-xl overflow-hidden shadow">
+                {selectedMedia?.type === "image" && (
+                  <ZoomImage src={`${process.env.REACT_APP_API_URL}/public/${selectedMedia.value}`} />
+                )}
+                {selectedMedia?.type === "video" && (
+                  <iframe
+                    className="w-full h-full"
+                    src={`https://www.youtube.com/embed/${selectedMedia.value}`}
+                    allowFullScreen
+                  />
+                )}
               </div>
             </div>
 
-
-
-            {/* REVIEWS */}
-            <div className="max-w-container mx-auto px-4 mt-10">
-              <ReviewsSection reviews={reviews} />
-
-              {/* REVIEW FORM */}
-              <form
-                onSubmit={handleSubmitReview}
-                className="bg-white p-5 rounded shadow mt-8"
-              >
-                <h3 className="text-xl font-semibold mb-3">Write a Review</h3>
-
-                <label className="block mb-1 font-medium">Rating</label>
-                <select
-                  className="border p-2 rounded w-full"
-                  value={rating}
-                  onChange={(e) => setRating(e.target.value)}
-                >
-                  <option value="5">5 - Excellent</option>
-                  <option value="4">4 - Very Good</option>
-                  <option value="3">3 - Good</option>
-                  <option value="2">2 - Fair</option>
-                  <option value="1">1 - Poor</option>
-                </select>
-
-                <label className="block mt-4 mb-1 font-medium">Comment</label>
-                <textarea
-                  className="border p-3 rounded w-full"
-                  rows="3"
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                  placeholder="Share your experience..."
-                />
-
-                <button
-                  type="submit"
-                  className="mt-4 bg-brandColor hover:bg-brandColor/70 text-white px-4 py-2 rounded"
-                >
-                  Submit Review
-                </button>
-              </form>
+            {/* Product Info */}
+            <div className="xl:col-span-3">
+              <ProductInfo
+                productInfo={productInfo}
+                selectedColor={selectedColor}
+                setSelectedColor={setSelectedColor}
+                selectedSize={selectedSize}
+                setSelectedSize={setSelectedSize}
+                availableSizes={availableSizes}
+              />
             </div>
-
-            {/* SIMILAR PRODUCTS */}
-            {similarProducts.length > 0 && (
-              <div className="mt-12">
-                <h2 className="text-2xl font-semibold mb-4">Similar Products</h2>
-
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                  {similarProducts.slice(0, 12).map((item) => (
-                    <div
-                      key={item.id}
-                      className="bg-white p-3 rounded shadow hover:shadow-lg cursor-pointer"
-                      onClick={() => window.location.href = `/product/${item.id}`}
-                    >
-                      <img
-                        src={`${process.env.REACT_APP_API_URL}/public/${item.image}`}
-                        alt={item.name}
-                        className="w-full h-40 object-cover rounded"
-                      />
-
-                      <p className="mt-2 text-sm font-semibold">{item.name}</p>
-
-                      <p className="text-brandColor font-bold mt-1">₹{item.price}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
+
+          {/* REVIEWS */}
+          <div className="max-w-container mx-auto px-4 mt-10">
+            <ReviewsSection reviews={reviews} />
+
+            {/* REVIEW FORM */}
+            <form
+              onSubmit={handleSubmitReview}
+              className="bg-white p-5 rounded shadow mt-8"
+            >
+              <h3 className="text-xl font-semibold mb-3">Write a Review</h3>
+
+              <label className="block mb-1 font-medium">Rating</label>
+              <select
+                className="border p-2 rounded w-full"
+                value={rating}
+                onChange={(e) => setRating(e.target.value)}
+              >
+                <option value="5">5 - Excellent</option>
+                <option value="4">4 - Very Good</option>
+                <option value="3">3 - Good</option>
+                <option value="2">2 - Fair</option>
+                <option value="1">1 - Poor</option>
+              </select>
+
+              <label className="block mt-4 mb-1 font-medium">Comment</label>
+              <textarea
+                className="border p-3 rounded w-full"
+                rows="3"
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder="Share your experience..."
+              />
+
+              <button
+                type="submit"
+                className="mt-4 bg-brandColor hover:bg-brandColor/70 text-white px-4 py-2 rounded"
+              >
+                Submit Review
+              </button>
+            </form>
+          </div>
+
+          {/* SIMILAR PRODUCTS */}
+          {similarProducts.length > 0 && (
+            <div className="mt-12">
+              <h2 className="text-2xl font-semibold mb-4">Similar Products</h2>
+
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                {similarProducts.slice(0, 12).map((item) => (
+                  <div
+                    key={item.id}
+                    className="bg-white p-3 rounded shadow hover:shadow-lg cursor-pointer"
+                    onClick={() => window.location.href = `/product/${item.id}`}
+                  >
+                    <img
+                      src={`${process.env.REACT_APP_API_URL}/public/${item.image}`}
+                      alt={item.name}
+                      className="w-full h-40 object-cover rounded"
+                    />
+
+                    <p className="mt-2 text-sm font-semibold">{item.name}</p>
+
+                    <p className="text-brandColor font-bold mt-1">₹{item.price}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
       <Footer />

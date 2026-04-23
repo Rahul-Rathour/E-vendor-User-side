@@ -7,11 +7,11 @@ const RazorpayPayment = () => {
   const navigate = useNavigate();
   const { checkout } = useCart();
 
-  const { totalAmt, shippingCharge, finalTotal, shippingAddress, cart, order_number } = state || {};
+  const { totalAmt, discountAmount, shippingCharge, finalTotal, shippingAddress, cart, order_number } = state || {};
 
   useEffect(() => {
     if (!state) return navigate("/checkout");
- 
+
     const loadRazorpay = () => {
       const script = document.createElement("script");
       script.src = "https://checkout.razorpay.com/v1/checkout.js";
@@ -22,16 +22,16 @@ const RazorpayPayment = () => {
     const openPaymentModal = () => {
       const options = {
         key: "rzp_test_RiOPHHMVoakNtd",
-        amount: finalTotal * 100,
+        amount: (finalTotal - discountAmount) * 100,
         currency: "INR",
         name: "My Shop",
-        description: "Order Payment", 
+        description: "Order Payment",
         handler: async function (response) {
           // After successful payment
-          const success = await checkout(shippingAddress, "Online",order_number);
+          const success = await checkout(shippingAddress, "Online", order_number, totalAmt, discountAmount, shippingCharge);
 
           if (success) {
-            navigate("/orderSuccess",{ state: { totalAmt, shippingCharge, shippingAddress, cart, order_number } });
+            navigate("/orderSuccess", { state: { totalAmt, discountAmount, shippingCharge, shippingAddress, cart, order_number } });
           } else {
             navigate("/paymentFailed");
           }
@@ -42,7 +42,7 @@ const RazorpayPayment = () => {
           },
         },
         prefill: {
-          name: "User", 
+          name: "User",
           email: "user@example.com",
         },
         theme: {

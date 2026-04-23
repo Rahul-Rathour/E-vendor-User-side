@@ -16,7 +16,7 @@ function Items({ currentItems, orderType }) {
                 _id={item.id}
                 img={`${process.env.REACT_APP_API_URL}/public/${item.image}`}
                 productName={item.name}
-                price={priceToShow}       // 👈 send correct price
+                price={item.price}       // 👈 send correct price
                 color=""
                 badge=""
                 des={item.description}

@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import api from "../api";
- 
+
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
@@ -35,28 +35,38 @@ export const CartProvider = ({ children }) => {
   }, [token]);
 
   // Add item to cart (GST added)
-  const addToCart = async (productId, price, gst) => {
-    try {
-      if (!token) {
-        toast.error("Please login to add items to cart");
-        return;
-      }
+  const addToCart = async (productId, price, gst, colorId, size) => {
+    if (!token) {
+      toast.error("Please login to add items to cart");
+      return;
+    }
 
+    if (!colorId || !size) {
+      toast.error("Please select color and size");
+      return;
+    }
+
+    try {
       const res = await api.post(
         "/cart-add",
         {
           product_id: productId,
+          product_color_id: colorId,     // Important
+          size: size,                    // Important
           quantity: 1,
           price: price,
-          gst: gst, // NEW FIELD
+          gst: gst || 0,
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      if (res.data.status) fetchCart();
+      if (res.data.status) {
+        toast.success("Added to cart!");
+        fetchCart();
+      }
     } catch (err) {
-      toast.error("Failed to add item to cart");
       console.error("Error adding to cart:", err);
+      toast.error(err.response?.data?.message || "Failed to add item to cart");
     }
   };
 
@@ -79,11 +89,11 @@ export const CartProvider = ({ children }) => {
       prev.map((item) =>
         item.id === id
           ? {
-              ...item,
-              quantity,
-              price,
-              gst,
-            }
+            ...item,
+            quantity,
+            price,
+            gst,
+          }
           : item
       )
     );
@@ -106,7 +116,7 @@ export const CartProvider = ({ children }) => {
   };
 
   // Checkout
-  const checkout = async (shippingAddress, paymentMethod, order_number) => {
+  const checkout = async (shippingAddress, paymentMethod, order_number, totalAmt, discountAmount) => {
     try {
       const res = await api.post(
         "/cart-checkout",
@@ -114,6 +124,9 @@ export const CartProvider = ({ children }) => {
           shipping_address: shippingAddress,
           payment_method: paymentMethod,
           order_number: order_number,
+          total_amount: totalAmt,
+          discount_amount: discountAmount,
+          shipping_charge: 0,
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -144,7 +157,7 @@ export const CartProvider = ({ children }) => {
         addToCart,
         removeFromCart,
         updateQuantity,
-        checkout, 
+        checkout,
         fetchCart,
         refreshToken,
       }}
