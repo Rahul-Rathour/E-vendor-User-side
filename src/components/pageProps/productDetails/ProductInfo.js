@@ -13,7 +13,7 @@ const ProductInfo = ({
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-3xl font-semibold">{productInfo.name}</h1>
+      <h1 className="text-3xl font-semibold uppercase">{productInfo.name}</h1>
       <p className="text-2xl font-bold text-brandColor">₹ {productInfo.price}</p>
 
       <div dangerouslySetInnerHTML={{ __html: productInfo.description }} />

@@ -55,6 +55,8 @@ import api from "./api";
 import { useEffect } from "react";
 import InvoicePage from "./pages/InvoicePage";
 import Faq from "./pages/Account/Faq";
+import Invoice from "./pages/Invoice";
+import Track from "./pages/Track/track";
 
 
 
@@ -103,11 +105,13 @@ const router = createBrowserRouter(
         <Route path="/search" element={<SearchResults />} />
         <Route path="/faq" element={<Faq />} />
         <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/invoice/:id" element={<Invoice />} />
+        <Route path="/track/:id" element={<Track />} />
+        <Route path="/product/:id" element={<ProductDetails />}></Route>
       </Route>
-      <Route path="/product/:id" element={<ProductDetails />}></Route>
       <Route path="/signup" element={<SignUp />}></Route>
-      <Route path="/signin" element={<SignIn />}></Route>
       <Route path="/login" element={<Login />}></Route>
+      <Route path="/signin" element={<SignIn />}></Route>
       <Route path="/order" element={<Myorder />} />
       <Route path="/order-details/:id" element={<OrderDetails />} />
       <Route path="/mobile-account" element={<MobileAccount />} />

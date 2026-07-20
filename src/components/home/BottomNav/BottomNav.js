@@ -14,10 +14,10 @@ const BottomNav = () => {
           <AiOutlineHome size={22} />
           <span>Home</span>
         </Link>
-        <Link to="/play" className="flex flex-col items-center justify-center">
+        {/* <Link to="/play" className="flex flex-col items-center justify-center">
           <FiPlay size={22} />
           <span>Play</span>
-        </Link>
+        </Link> */}
         <Link to="/categories" className="flex flex-col items-center justify-center">
           <BsGrid size={22} />
           <span>Categories</span>

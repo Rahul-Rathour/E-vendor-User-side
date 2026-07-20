@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 const Footer = () => {
   const [siteTitle, setSiteTitle] = useState("");
   const [address, setAddress] = useState("");
+  const [email, setEmail] = useState("");
 
   useEffect(() => {
     api.get("/home-setting")
@@ -13,6 +14,7 @@ const Footer = () => {
         if (res.data?.title) {
           setSiteTitle(res.data.title);   // Save title in state
           setAddress(res.data.address);
+          setEmail(res.data.email);
         }
       })
       .catch(err => {
@@ -27,17 +29,23 @@ const Footer = () => {
         <div>
           <h3 className="text-white font-semibold mb-3">ABOUT</h3>
           <ul className="space-y-2 text-sm">
-            <li>Contact Us</li>
-            <li>About Us</li>
-            <li>Careers</li>
+            <li>
+              <Link to={'/contact'}>
+                Contact Us
+              </Link> 
+            </li>
+
+            <li>
+              <Link to={'/about'}>
+                About Us
+              </Link>
+            </li>
+            
             <li>DOceanr Stories</li>
             <li>Press</li>
             <li>Corporate Information</li>
           </ul>
         </div>
-
-        {/* Group Companies */}
-
 
         {/* Help */}
         <div>
@@ -46,9 +54,11 @@ const Footer = () => {
             <li>Payments</li>
             <li>Shipping</li>
             <li>Cancellation & Returns</li>
-            <Link to={'/faq'}>
-              <li>FAQ</li>
-            </Link>
+            <li>
+              <Link to={'/faq'}>
+                FAQ
+              </Link>
+            </li>
           </ul>
         </div>
 
@@ -71,12 +81,7 @@ const Footer = () => {
         <div className="col-span-2 md:col-span-2 lg:col-span-1">
           <h3 className="text-white font-semibold mb-3">Mail Us:</h3>
           <p className="text-sm leading-6">
-            DOceanr Shopping Private Limited,<br />
-            Buildings Alyssa, Begonia &<br />
-            Clove Embassy Tech Village,<br />
-            Outer Ring Road, Devarabeesanahalli Village,<br />
-            Bengaluru, 560103,<br />
-            Karnataka, India
+            {email}
           </p>
         </div>
 

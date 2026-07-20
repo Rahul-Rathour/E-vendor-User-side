@@ -122,7 +122,7 @@ const ProductDetails = () => {
 
   return (
     <>
-      <HeaderCopy />
+      {/* <HeaderCopy /> */}
       <SpecialCase />
       <div className="p-4">
         <div className="max-w-container mx-auto px-4">
@@ -228,7 +228,7 @@ const ProductDetails = () => {
                       className="w-full h-40 object-cover rounded"
                     />
 
-                    <p className="mt-2 text-sm font-semibold">{item.name}</p>
+                    <p className="mt-2 text-sm font-semibold uppercase">{item.name}</p>
 
                     <p className="text-brandColor font-bold mt-1">₹{item.price}</p>
                   </div>
@@ -238,7 +238,7 @@ const ProductDetails = () => {
           )}
         </div>
       </div>
-      <Footer />
+      {/* <Footer /> */}
     </>
   );
 };

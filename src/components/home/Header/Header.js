@@ -79,7 +79,8 @@ const Header = () => {
     localStorage.setItem("orderType", next);
 
     setSidenav(false);
-    window.location.reload(); // optional: refresh UI to apply change globally
+    // window.location.reload(); // optional: refresh UI to apply change globally
+    window.location.href = "https://bulk.blackhewzen.com/";
   };
 
 
@@ -397,9 +398,7 @@ const Header = () => {
                 <FaUser className="text-gray-700" />
 
                 <span>
-                  {localStorage.getItem("orderType") === "wholesale_price"
-                    ? "Switch to General Order"
-                    : "Switch to Bulk Order"}
+                Switch to Bulk Order
                 </span>
               </button>
 

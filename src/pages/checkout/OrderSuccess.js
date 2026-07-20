@@ -11,7 +11,7 @@ const OrderSuccess = () => {
   const { totalAmt, discountAmount, order_number, shippingAddress } = state || {};
 
   const handleGenerateInvoice = () => {
-    navigate("/invoice", { state });
+    navigate("/invoice", { state }); 
   };
 
   // Confetti Effect
@@ -87,12 +87,12 @@ const OrderSuccess = () => {
           </div>
 
           <div className="mt-10 space-y-4">
-            <button
+            {/* <button
               onClick={handleGenerateInvoice}
               className="w-full bg-primeColor hover:bg-black text-white py-4 rounded-2xl font-semibold text-lg transition-all duration-300"
             >
               Download Invoice
-            </button>
+            </button> */}
 
             <Link
               to="/"

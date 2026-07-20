@@ -7,7 +7,7 @@ import BottomNav from "../../components/home/BottomNav/BottomNav";
 
 const Myorders = () => {
   const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); 
   const [error, setError] = useState("");
 
   const userId = JSON.parse(localStorage.getItem("user")); // Replace this with dynamic logged-in user ID (e.g., from context or localStorage)

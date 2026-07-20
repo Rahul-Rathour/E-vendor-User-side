@@ -116,7 +116,7 @@ export const CartProvider = ({ children }) => {
   };
 
   // Checkout
-  const checkout = async (shippingAddress, paymentMethod, order_number, totalAmt, discountAmount) => {
+  const checkout = async (shippingAddress, paymentMethod, order_number, totalAmt, discountAmount, selectedCoupon, userGst) => {
     try {
       const res = await api.post(
         "/cart-checkout",
@@ -127,6 +127,8 @@ export const CartProvider = ({ children }) => {
           total_amount: totalAmt,
           discount_amount: discountAmount,
           shipping_charge: 0,
+          applied_coupon: selectedCoupon,
+          user_gst:userGst,
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
