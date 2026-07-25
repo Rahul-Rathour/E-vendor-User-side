@@ -5,11 +5,12 @@ import { toast } from "react-toastify";
 import Breadcrumbs from "../../components/pageProps/Breadcrumbs";
 
 const CheckoutPage = () => {
-  const { state } = useLocation();
+  const { state } = useLocation(); 
   const navigate = useNavigate();
   const { checkout } = useCart();
 
   const [shippingAddress, setShippingAddress] = useState("");
+  const [usergst, setUsergst] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("COD");
 
   if (!state) {
@@ -42,7 +43,9 @@ const CheckoutPage = () => {
         order_number,
         totalAmt,           // mrp 
         // finalTotal,        // send FINAL amount
-        discountAmount
+        discountAmount,
+        selectedCoupon?.code || "none",
+        usergst
       );
       if (success) {
         navigate("/orderSuccess", {
@@ -180,6 +183,17 @@ const CheckoutPage = () => {
                 placeholder="House No, Street, Area, City, State, Pincode..."
                 value={shippingAddress}
                 onChange={(e) => setShippingAddress(e.target.value)}
+              />
+            </div>
+            <div className="mb-8">
+              <label className="block text-gray-700 font-medium mb-2">
+                GST No.
+              </label>
+              <input
+                className="w-full border border-gray-300 rounded-2xl p-4 focus:ring-2 focus:ring-primeColor focus:border-transparent outline-none resize-y"
+                placeholder="Your gst no..."
+                value={usergst}
+                onChange={(e) => setUsergst(e.target.value)}
               />
             </div>
 

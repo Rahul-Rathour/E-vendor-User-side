@@ -19,9 +19,6 @@ const NewArrivals = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
-
-
-
   const settings = {
     infinite: true,
     speed: 500,

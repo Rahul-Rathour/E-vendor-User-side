@@ -1,111 +1,63 @@
-import React, { useEffect, useState } from "react";
-import { FaFacebook, FaYoutube, FaInstagram, FaTwitter } from "react-icons/fa";
-import api from "../../../api";
-import { Link } from "react-router-dom";
+import React from "react";
+
+import FooterBrand from "./FooterBrand";
+import FooterLinks from "./FooterLinks";
+import FooterContact from "./FooterContact";
+import FooterBottom from "./FooterBottom";
 
 const Footer = () => {
-  const [siteTitle, setSiteTitle] = useState("");
-  const [address, setAddress] = useState("");
-
-  useEffect(() => {
-    api.get("/home-setting")
-      .then(res => {
-        if (res.data?.title) {
-          setSiteTitle(res.data.title);   // Save title in state
-          setAddress(res.data.address);
-        }
-      })
-      .catch(err => {
-        console.error("Footer home-setting error:", err);
-      });
-  }, []);
   return (
-    <footer className="w-full bg-[#131921] text-gray-300 pt-10 pb-6">
-      <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 px-6">
+    <footer className="bg-[#0D0D0D] text-white pt-14">
 
-        {/* About */}
-        <div>
-          <h3 className="text-white font-semibold mb-3">ABOUT</h3>
-          <ul className="space-y-2 text-sm">
-            <li>Contact Us</li>
-            <li>About Us</li>
-            <li>Careers</li>
-            <li>DOceanr Stories</li>
-            <li>Press</li>
-            <li>Corporate Information</li>
-          </ul>
+      <div className="max-w-[1400px] mx-auto px-6">
+
+        {/* Top */}
+
+        <div className="grid lg:grid-cols-[1.4fr_1fr_1fr_1.2fr] gap-12 pb-10">
+
+          <FooterBrand />
+
+          <FooterLinks
+            title="QUICK LINKS"
+            links={[
+              { name: "Home", url: "/" },
+              { name: "About Us", url: "/about" },
+              { name: "Bulk Order", url: "/bulk-order" },
+              { name: "Contact Us", url: "/contact" },
+            ]}
+          />
+
+          <FooterLinks
+            title="HELP & SUPPORT"
+            links={[
+              { name: "FAQ's", url: "/faq" },
+              { name: "Shipping Policy", url: "/shipping-policy" },
+              { name: "Return Policy", url: "/return-policy" },
+              { name: "Privacy Policy", url: "/privacy-policy" },
+              { name: "Terms & Conditions", url: "/terms" },
+             
+            ]}
+          />
+
+          {/* <FooterLinks
+            title="DEALER ZONE"
+            links={[
+              { name: "Dealer Login", url: "/dealer-login" },
+              { name: "Become a Dealer", url: "/become-dealer" },
+              { name: "Wholesale Policy", url: "/wholesale-policy" },
+              { name: "Download Catalog", url: "/catalog" },
+            ]}
+          /> */}
+
+          <FooterContact />
+
         </div>
 
-        {/* Group Companies */}
+        <FooterBottom />
 
-
-        {/* Help */}
-        <div>
-          <h3 className="text-white font-semibold mb-3">HELP</h3>
-          <ul className="space-y-2 text-sm">
-            <li>Payments</li>
-            <li>Shipping</li>
-            <li>Cancellation & Returns</li>
-            <Link to={'/faq'}>
-              <li>FAQ</li>
-            </Link>
-          </ul>
-        </div>
-
-        {/* Consumer Policy */}
-        <div>
-          <h3 className="text-white font-semibold mb-3">CONSUMER POLICY</h3>
-          <ul className="space-y-2 text-sm">
-            <li>Cancellation & Returns</li>
-            <li>Terms of Use</li>
-            <li>Security</li>
-            <li>Privacy</li>
-            <li>Sitemap</li>
-            <li>Grievance Redressal</li>
-            <li>EPR Compliance</li>
-            <li>FSSAI Food Safety</li>
-          </ul>
-        </div>
-
-        {/* Mail Us */}
-        <div className="col-span-2 md:col-span-2 lg:col-span-1">
-          <h3 className="text-white font-semibold mb-3">Mail Us:</h3>
-          <p className="text-sm leading-6">
-            DOceanr Shopping Private Limited,<br />
-            Buildings Alyssa, Begonia &<br />
-            Clove Embassy Tech Village,<br />
-            Outer Ring Road, Devarabeesanahalli Village,<br />
-            Bengaluru, 560103,<br />
-            Karnataka, India
-          </p>
-        </div>
-
-        {/* Registered Office Address */}
-        <div className="col-span-2 md:col-span-2 lg:col-span-1">
-          <h3 className="text-white font-semibold mb-3">Registered Office Address:</h3>
-          <p className="text-sm leading-6">
-            {siteTitle}<br />
-            {address}<br />
-          </p>
-        </div>
       </div>
 
-      {/* Social Icons */}
-      <div className="border-t border-gray-600 mt-10 pt-4 flex flex-col md:flex-row justify-center items-center gap-4 text-white">
-        <p className="text-sm">Social:</p>
-        <div className="flex items-center gap-4 text-lg">
-          <FaFacebook className="hover:text-blue-500 cursor-pointer" />
-          <FaTwitter className="hover:text-blue-400 cursor-pointer" />
-          <FaInstagram className="hover:text-pink-500 cursor-pointer" />
-          <FaYoutube className="hover:text-red-500 cursor-pointer" />
-        </div>
-      </div>
-
-      {/* Bottom strip */}
-      <div className="text-center text-gray-400 text-xs mt-4">
-        © 2007–2026 {siteTitle}
-      </div>
-    </footer >
+    </footer>
   );
 };
 

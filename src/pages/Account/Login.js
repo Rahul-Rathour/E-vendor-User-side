@@ -6,6 +6,7 @@ import Header from '../../components/home/Header/Header';
 import logonew from '../../assets/images/logonew.jpg';
 import Footer from '../../components/home/Footer/Footer';
 import api from '../../api';
+import BottomNav from '../../components/home/BottomNav/BottomNav';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -112,7 +113,7 @@ const Login = () => {
 
                 <button
                   type="submit"
-                  className="w-full py-2 px-4 bg-purple-700 text-white font-semibold rounded-md hover:bg-purple-800 transition duration-300"
+                  className="w-full py-2 px-4 bg-primeColor text-white font-semibold rounded-md hover:bg-purple-800 transition duration-300"
                 >
                   Login
                 </button>
@@ -121,7 +122,7 @@ const Login = () => {
                   Don’t have an account?{' '}
                   <span
                     onClick={() => navigate('/signup')}
-                    className="text-purple-700 hover:underline cursor-pointer"
+                    className="text-blue-600 hover:underline cursor-pointer"
                   >
                     Sign Up
                   </span>
@@ -134,6 +135,7 @@ const Login = () => {
 
       {/* Footer at bottom */}
       <Footer />
+      <BottomNav/>
     </>
   );
 };

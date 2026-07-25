@@ -7,7 +7,7 @@ const CategoryBar = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchCategories = async () => { 
+    const fetchCategories = async () => {
       try {
         const res = await api.get("/categories");
         setCategories(res.data.data || []);
@@ -17,7 +17,7 @@ const CategoryBar = () => {
     };
     fetchCategories();
   }, []);
- 
+
   return (
     <div className="relative w-full bg-white border-b py-4 px-2 overflow-x-auto whitespace-nowrap flex gap-4 scrollbar-hide z-1 md:justify-center md:flex-wrap md:overflow-visible">
       {categories.map((cat) => (
@@ -27,7 +27,7 @@ const CategoryBar = () => {
         >
           {/* Main Category Image + Name */}
           <div
-            onClick={() => navigate(`/category/${cat.id}`)} 
+            onClick={() => navigate(`/category/${cat.id}`)}
             className="flex flex-col items-center hover:scale-105 transition-transform duration-200"
           >
             <img
@@ -39,7 +39,7 @@ const CategoryBar = () => {
               alt={cat.name}
               className="w-14 h-14 mb-1 object-cover rounded-full border border-gray-200"
             />
-            <span className="text-sm text-gray-900 text-center font-bold flex items-center gap-1 relative">
+            <span className="text-sm text-gray-900 text-center font-bold w-[80px] block truncate">
               {cat.name}
 
               {/* Optional dropdown arrow indicator if subcategories exist */}

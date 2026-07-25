@@ -1,38 +1,29 @@
 import React, { useState } from "react";
 import { BsSuitHeart, BsSuitHeartFill } from "react-icons/bs";
-import { GiReturnArrow } from "react-icons/gi";
-import { FaShoppingCart } from "react-icons/fa";
-import { MdOutlineLabelImportant } from "react-icons/md";
-import Image from "../../designLayouts/Image";
-import Badge from "./Badge";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
 import { useCart } from "../../../context/CartContext";
 import { toast } from "react-toastify";
 import api from "../../../api";
-// import { addToCart } from "../../../redux/orebiSlice";
-// import { addToWishlist } from "../../../redux/orebiSlice";
+import Badge from "./Badge";
 
 const Product = (props) => {
-  const [activeWishlist, setActiveWishlist] = useState([]); // store highlighted product ID
-  const { addToCart } = useCart();
-  const dispatch = useDispatch();
-  const _id = props.productName;
-  const idString = (_id) => {
-    return String(_id).toLowerCase().split(" ").join("");
-  };
-  const rootId = idString(_id);
-
   const navigate = useNavigate();
+
+  const { addToCart } = useCart();
+
+  const [activeWishlist, setActiveWishlist] = useState([]);
+
   const productItem = props;
+
   const handleProductDetails = () => {
     navigate(`/product/${props._id}`, {
       state: { product: productItem },
     });
   };
-  //  Handle Add to Wishlist
+
   const handleAddToWishlist = async (productId) => {
     const user = JSON.parse(localStorage.getItem("user"));
+
     if (!user) {
       toast.warning("Please login to add to wishlist");
       return;
@@ -45,89 +36,180 @@ const Product = (props) => {
       });
 
       if (res.data.status) {
-        toast.success(res.data.message || "Added to wishlist ❤️");
-        // ✅ Add this productId to wishlistItems if not already there
-        setActiveWishlist((prev) => [...prev, productId]);
-      } else {
-        toast.info(res.data.message || "Already in wishlist");
-        // ✅ Still highlight it even if already in wishlist
+        toast.success(res.data.message);
+
         setActiveWishlist((prev) =>
-          prev.includes(productId) ? prev : [...prev, productId]
+          prev.includes(productId)
+            ? prev
+            : [...prev, productId]
+        );
+      } else {
+        toast.info(res.data.message);
+
+        setActiveWishlist((prev) =>
+          prev.includes(productId)
+            ? prev
+            : [...prev, productId]
         );
       }
     } catch (err) {
-      console.error(err);
-      toast.error("Something went wrong while adding to wishlist");
+      toast.error("Unable to add wishlist");
     }
-  }
+  };
 
   return (
-    <div className="w-full relative group overflow-hidden hover:bg-slate-50">
-      {/* <div className="max-w-80 max-h-80 relative overflow-y-hidden "> */}
-      <div className="w-60 h-64 relative overflow-hidden flex items-center justify-center">
-        <div onClick={handleProductDetails} className="cursor-pointer">
-          <Image className="w-full h-full" imgSrc={props.img} />
-        </div>
-        <div className="absolute top-6 left-8">
-          {props.badge && <Badge text={props.badge_text} />}
-        </div>
-        <div className="w-full h-32 absolute -bottom-[130px] group-hover:bottom-0 duration-700 flex items-center justify-center">
-          <ul className="flex items-center justify-center gap-4 font-titleFont">
-            <li
-              className="w-12 h-12 flex items-center justify-center rounded-full bg-white text-brandColor hover:bg-brandColor hover:text-white shadow-md hover:shadow-lg duration-300 cursor-pointer text-2xl"
-              title="Compare">
-              <GiReturnArrow />
-            </li>
-            <li
-              onClick={() => addToCart(props._id, props.price)}
-              className="flex items-center justify-center w-10 h-10 rounded-full bg-white text-brandColor hover:bg-brandColor hover:text-white text-xl shadow-md hover:shadow-lg cursor-pointer"
-            >
-              <FaShoppingCart />
-            </li>
-            <li
-              onClick={handleProductDetails}
-              className="w-12 h-12 flex items-center justify-center rounded-full bg-white text-brandColor hover:bg-brandColor hover:text-white shadow-md hover:shadow-lg duration-300 cursor-pointer text-2xl"
-              title="View Details"
-            >
-              <MdOutlineLabelImportant />
-            </li>
-            <li
-              onClick={() => handleAddToWishlist(props._id)}
-              className={`flex items-center justify-center w-10 h-10 rounded-full bg-white text-xl shadow-md hover:shadow-lg cursor-pointer transition-all duration-300 ${activeWishlist.includes(props._id)
-                ? "text-brandColor"
-                : "text-gray-400 hover:text-brandColor"
-                }`}
-            >
-              {activeWishlist.includes(props._id) ? (
-                <BsSuitHeartFill />
-              ) : (
-                <BsSuitHeart />
-              )}
-            </li>
-          </ul> 
-        </div>
+
+    <div
+      className="
+        group
+        cursor-pointer
+        bg-white
+        rounded-xl
+        overflow-hidden
+        transition-all
+        duration-300
+        hover:shadow-xl
+    "
+    >
+      <div
+        className="
+        relative
+        overflow-hidden
+        bg-[#F8F8F8]
+        rounded-xl
+    "
+      >
+        {props.badge && (
+
+          <div className="absolute top-4 left-4 z-20">
+
+            <Badge text={props.badge_text} />
+
+          </div>
+
+        )}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            handleAddToWishlist(props._id);
+          }}
+          className="
+        absolute
+        top-4
+        right-4
+        z-20
+        w-10
+        h-10
+        rounded-full
+        bg-white
+        shadow-md
+        flex
+        items-center
+        justify-center
+        transition-all
+        duration-300
+        hover:scale-110
+    "
+        >
+
+          {
+            activeWishlist.includes(props._id)
+
+              ?
+
+              <BsSuitHeartFill
+                className="text-red-500 text-lg"
+              />
+
+              :
+
+              <BsSuitHeart
+                className="text-gray-500 text-lg"
+              />
+
+          }
+
+        </button>
+        <img
+          src={props.img}
+          alt={props.productName}
+          onClick={handleProductDetails}
+          className="
+        w-full
+        h-[300px]
+        object-cover
+        transition-transform
+        duration-500
+        group-hover:scale-110
+    "
+        />
       </div>
+      {/* Product Info */}
+      <div
+        className="p-5"
+        onClick={handleProductDetails}
+      >
+        {/* Color Options */}
+        <div className="flex items-center gap-2 mb-4">
+          <span className="w-3 h-3 rounded-full bg-black border border-gray-300"></span>
+          <span className="w-3 h-3 rounded-full bg-gray-500 border border-gray-300"></span>
+          <span className="w-3 h-3 rounded-full bg-[#D4AF37] border border-gray-300"></span>
+        </div>
 
-      <div className="max-w-80 py-4 flex flex-col gap-1 px-4">
-
-        {/* Product Name (2 lines max) */}
-        <h2 className="text-[15px] font-semibold text-gray-900 line-clamp-2 leading-tight">
+        {/* Product Name */}
+        <h3
+          className="
+            text-[16px]
+            font-semibold
+            text-gray-900
+            leading-6
+            line-clamp-2
+            min-h-[52px]
+            hover:text-[#D4AF37]
+            transition-colors
+            duration-300
+          "
+        >
           {props.productName}
-        </h2>
-
-        {/* Description (2 lines max) */}
-        <p className="text-[13px] text-gray-600 line-clamp-2 leading-snug">
-          {props.des}
-        </p>
+        </h3>
 
         {/* Price */}
-        <p className="text-[17px] font-bold mt-1">
-          ₹ {props.price}
-        </p>
+        <div className="flex items-center justify-between mt-3">
+
+          <span className="text-xl font-bold text-black">
+            ₹ {props.price}
+          </span>
+
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              addToCart(props._id, props.price);
+            }}
+            className="
+              opacity-0
+              group-hover:opacity-100
+              transition-all
+              duration-300
+              bg-black
+              hover:bg-[#D4AF37]
+              hover:text-black
+              text-white
+              px-4
+              py-2
+              rounded-md
+              text-sm
+              font-medium
+            "
+          >
+            Add
+          </button>
+
+        </div>
+
       </div>
 
     </div>
   );
-}; 
+};
 
 export default Product;

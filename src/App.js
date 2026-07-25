@@ -11,7 +11,8 @@ import {
 } from "react-router-dom";
 import Footer from "./components/home/Footer/Footer";
 import FooterBottom from "./components/home/Footer/FooterBottom";
-import Header from "./components/home/Header/Header";
+import Header from "./components/Header/Header";
+// import Header from "./components/home/Header/Header";
 import HeaderBottom from "./components/home/Header/HeaderBottom";
 import SpecialCase from "./components/SpecialCase/SpecialCase";
 import About from "./pages/About/About";
@@ -55,15 +56,18 @@ import api from "./api";
 import { useEffect } from "react";
 import InvoicePage from "./pages/InvoicePage";
 import Faq from "./pages/Account/Faq";
-
-
-
+import Invoice from "./pages/Invoice";
+import Track from "./pages/Track/track";
+import ReturnPolicy from "./pages/ReturnPolicy";
+import ShippingPolicy from "./pages/ShippingPolicy";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsConditions from "./pages/TermsConditions";
 
 const Layout = () => {
   return (
     <div>
       <Header />
-      <HeaderBottom />
+      {/* <HeaderBottom /> */}
       <SpecialCase />
       <ScrollRestoration />
 
@@ -88,6 +92,10 @@ const router = createBrowserRouter(
         <Route path="/fashion" element={<Fashion />}></Route>
         <Route path="/kids" element={<Kids />}></Route>
         <Route path="/toys" element={<Toys />}></Route>
+        <Route path='/return-policy' element={<ReturnPolicy/>}/>
+        <Route path='/shipping-policy' element={<ShippingPolicy/>}/>
+        <Route path='/privacy-policy' element={<PrivacyPolicy/>}/>
+        <Route path='/terms' element={<TermsConditions/>}/>
         <Route path="/productFilte" element={<ProductFilter />}></Route>
         {/* ==================== Header Navlink End here ===================== */}
         <Route path="/offer" element={<Offer />}></Route>
@@ -103,11 +111,13 @@ const router = createBrowserRouter(
         <Route path="/search" element={<SearchResults />} />
         <Route path="/faq" element={<Faq />} />
         <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/invoice/:id" element={<Invoice />} />
+        <Route path="/track/:id" element={<Track />} />
+        <Route path="/product/:id" element={<ProductDetails />}></Route>
       </Route>
-      <Route path="/product/:id" element={<ProductDetails />}></Route>
       <Route path="/signup" element={<SignUp />}></Route>
-      <Route path="/signin" element={<SignIn />}></Route>
       <Route path="/login" element={<Login />}></Route>
+      <Route path="/signin" element={<SignIn />}></Route>
       <Route path="/order" element={<Myorder />} />
       <Route path="/order-details/:id" element={<OrderDetails />} />
       <Route path="/mobile-account" element={<MobileAccount />} />
