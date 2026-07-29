@@ -517,7 +517,7 @@ const Header = () => {
           <Link to="/wishlist" className="flex items-center gap-2">
             <FaHeart className="text-gray-700 hover:text-red-500" />
             <span>Wishlist</span>
-          </Link>
+          </Link> 
         </div>
       </div>
     </div>

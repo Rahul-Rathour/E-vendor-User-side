@@ -9,6 +9,7 @@ import api from "../../api";
 import HeaderCopy from "../../components/home/Header-copy/HeaderCopy";
 import Footer from "../../components/home/Footer/Footer";
 import SpecialCase from "../../components/SpecialCase/SpecialCase";
+import ProductDetailsTabs from "./ProductDetailsTabs";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -167,6 +168,9 @@ const ProductDetails = () => {
               />
             </div>
           </div>
+
+          {/* NEW COMPONENT */}
+          <ProductDetailsTabs productInfo={productInfo} />
 
           {/* REVIEWS */}
           <div className="max-w-container mx-auto px-4 mt-10">

@@ -11,7 +11,8 @@ import {
 } from "react-router-dom";
 import Footer from "./components/home/Footer/Footer";
 import FooterBottom from "./components/home/Footer/FooterBottom";
-import Header from "./components/home/Header/Header";
+import Header from "./components/Header/Header";
+// import Header from "./components/home/Header/Header";
 import HeaderBottom from "./components/home/Header/HeaderBottom";
 import SpecialCase from "./components/SpecialCase/SpecialCase";
 import About from "./pages/About/About";
@@ -57,6 +58,11 @@ import InvoicePage from "./pages/InvoicePage";
 import Faq from "./pages/Account/Faq";
 import Invoice from "./pages/Invoice";
 import Track from "./pages/Track/track";
+import ReturnPolicy from "./pages/ReturnPolicy";
+import ShippingPolicy from "./pages/ShippingPolicy";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsConditions from "./pages/TermsConditions";
+import NewArrivals from "./components/home/NewArrivals/NewArrivals";
 
 
 
@@ -65,7 +71,7 @@ const Layout = () => {
   return (
     <div>
       <Header />
-      <HeaderBottom />
+      {/* <HeaderBottom /> */}
       <SpecialCase />
       <ScrollRestoration />
 
@@ -90,6 +96,10 @@ const router = createBrowserRouter(
         <Route path="/fashion" element={<Fashion />}></Route>
         <Route path="/kids" element={<Kids />}></Route>
         <Route path="/toys" element={<Toys />}></Route>
+        <Route path='/return-policy' element={<ReturnPolicy />} />
+        <Route path='/shipping-policy' element={<ShippingPolicy />} />
+        <Route path='/privacy-policy' element={<PrivacyPolicy />} />
+        <Route path='/terms' element={<TermsConditions />} />
         <Route path="/productFilte" element={<ProductFilter />}></Route>
         {/* ==================== Header Navlink End here ===================== */}
         <Route path="/offer" element={<Offer />}></Route>
@@ -107,7 +117,8 @@ const router = createBrowserRouter(
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/invoice/:id" element={<Invoice />} />
         <Route path="/track/:id" element={<Track />} />
-        <Route path="/product/:id" element={<ProductDetails />}></Route>
+        <Route path="/product/:id" element={<ProductDetails />} />
+        <Route path="/new-arrivals" element={<NewArrivals />} />
       </Route>
       <Route path="/signup" element={<SignUp />}></Route>
       <Route path="/login" element={<Login />}></Route>
