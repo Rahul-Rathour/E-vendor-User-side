@@ -1,7 +1,17 @@
 import React, { useState } from "react";
 import { BsCheckCircleFill } from "react-icons/bs";
+import {
+  FaEnvelope,
+  FaLock,
+  FaEye,
+  FaEyeSlash,
+  FaPhoneAlt,
+} from "react-icons/fa";
+
+import { FcGoogle } from "react-icons/fc";
 import { Link, useNavigate } from "react-router-dom";
 import { logoLight } from "../../assets/images";
+import logonew from '../../assets/images/logonew.jpg';
 import api from "../../api"; // Keep your API instance
 import Header from "../../components/home/Header/Header";
 import Footer from "../../components/home/Footer/Footer";
@@ -9,6 +19,7 @@ import BottomNav from "../../components/home/BottomNav/BottomNav";
 
 const SignUp = () => {
   // State for form fields
+  const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -78,212 +89,320 @@ const SignUp = () => {
 
   return (
     <>
-      <Header />
-      <div className="w-full h-screen flex items-center justify-start">
-        {/* LEFT SIDE PANEL */}
-        <div className="w-1/2 hidden lgl:inline-flex h-full text-white">
-          <div className="w-[450px] h-full bg-primeColor px-10 flex flex-col gap-6 justify-center">
-            <Link to="/">
-              <img src={logoLight} alt="logoImg" className="w-28" />
-            </Link>
-            <div className="flex flex-col gap-1 -mt-1">
-              <h1 className="font-titleFont text-xl font-medium">
-                Get started for free
+      {/* <Header /> */}
+
+      <div className="min-h-screen bg-white">
+        <div className="flex flex-col lg:flex-row min-h-screen">
+
+          {/* ================= Left Banner ================= */}
+
+          <div className="relative lg:w-1/2 bg-black overflow-hidden">
+
+            <img
+              src={logonew}
+              alt="Signup Banner"
+              className="absolute inset-0 w-full h-full object-cover opacity-60"
+            />
+
+            <div className="absolute inset-0 bg-gradient-to-r from-black/90 to-black/40"></div>
+
+            <div className="relative z-10 flex flex-col h-full px-8 md:px-16 py-16 text-white">
+
+              <p className="uppercase tracking-[8px] text-[#C79D17] text-sm md:text-lg mb-4">
+                JOIN BLACK HEWZEN
+              </p>
+
+              <h1 className="text-5xl md:text-7xl font-bold mb-4">
+                Sign Up
               </h1>
-              <p className="text-base">Create your account to access more</p>
-            </div>
 
-            <div className="w-[300px] flex items-start gap-3">
-              <span className="text-green-500 mt-1">
-                <BsCheckCircleFill />
-              </span>
-              <p className="text-base text-gray-300">
-                <span className="text-white font-semibold font-titleFont">
-                  Register quickly & easily
-                </span>
+              <div className="w-20 h-[2px] bg-[#C79D17] mb-6"></div>
+
+              <p className="text-lg md:text-2xl leading-relaxed max-w-md">
+                Create your account to enjoy
                 <br />
-                Join our platform and start managing your account right away.
+                Premium Shopping Experience
               </p>
-            </div>
 
-            <div className="w-[300px] flex items-start gap-3">
-              <span className="text-green-500 mt-1">
-                <BsCheckCircleFill />
-              </span>
-              <p className="text-base text-gray-300">
-                <span className="text-white font-semibold font-titleFont">
-                  Secure and reliable
-                </span>
-                <br />
-                Your information is encrypted and safely stored.
-              </p>
-            </div>
-
-            <div className="flex items-center justify-between mt-10">
-              <p className="text-sm font-titleFont font-semibold text-gray-300 hover:text-white cursor-pointer duration-300">
-                © OREBI
-              </p>
-              <p className="text-sm font-titleFont font-semibold text-gray-300 hover:text-white cursor-pointer duration-300">
-                Terms
-              </p>
-              <p className="text-sm font-titleFont font-semibold text-gray-300 hover:text-white cursor-pointer duration-300">
-                Privacy
-              </p>
-              <p className="text-sm font-titleFont font-semibold text-gray-300 hover:text-white cursor-pointer duration-300">
-                Security
-              </p>
             </div>
           </div>
-        </div>
 
-        {/* RIGHT SIDE FORM */}
-        <div className="w-full lgl:w-[500px] h-full flex flex-col justify-center">
-          {successMsg ? (
-            <div className="w-[500px]">
-              <p className="w-full px-4 py-10 text-green-500 font-medium font-titleFont">
-                {successMsg}
-              </p>
-              <button
-                onClick={() => navigate("/login")}
-                className="w-full h-10 bg-primeColor rounded-md text-gray-200 text-base font-titleFont font-semibold 
-              tracking-wide hover:bg-black hover:text-white duration-300"
+          {/* ================= Right Form ================= */}
+
+          <div className="lg:w-1/2 flex items-center justify-center px-6 py-12 bg-white">
+
+            {successMsg ? (
+
+              <div className="w-full max-w-xl text-center">
+
+                <h2 className="text-4xl font-serif mb-6">
+                  Registration Successful
+                </h2>
+
+                <p className="text-green-600 text-lg mb-8">
+                  {successMsg}
+                </p>
+
+                <button
+                  onClick={() => navigate("/login")}
+                  className="w-full h-14 rounded-xl bg-black text-[#C79D17] text-lg font-semibold hover:bg-neutral-900 transition"
+                >
+                  Login →
+                </button>
+
+              </div>
+
+            ) : (
+
+              <form
+                onSubmit={handleSignUp}
+                autoComplete="off"
+                className="w-full max-w-xl"
               >
-                Login
-              </button>
-            </div>
-          ) : (
-            <form
-              onSubmit={handleSignUp}
-              className="w-full lgl:w-[500px] h-screen flex items-center justify-center"
-            >
-              <div className="px-6 py-4 w-full h-[96%] flex flex-col justify-start overflow-y-scroll scrollbar-thin scrollbar-thumb-primeColor">
-                <h1 className="font-titleFont underline underline-offset-4 decoration-[1px] font-semibold text-2xl mdl:text-3xl mb-4">
-                  Create your account
-                </h1>
 
-                {/* Display General Error */}
+                <h2 className="text-5xl font-serif text-center text-gray-900">
+                  Create Account
+                </h2>
+
+                <div className="flex justify-center items-center gap-4 mt-4">
+
+                  <div className="w-14 h-px bg-[#C79D17]"></div>
+
+                  <img
+                    src={logonew}
+                    alt=""
+                    className="w-8 h-8 object-contain"
+                  />
+
+                  <div className="w-14 h-px bg-[#C79D17]"></div>
+
+                </div>
+
+                <p className="text-center text-gray-500 mt-4 mb-10">
+                  Create your account to continue
+                </p>
+
+                {/* General Error */}
+
                 {error.general && (
-                  <p className="text-sm text-red-500 mb-2 font-semibold">
+                  <p className="text-red-500 text-center mb-5 font-medium">
                     {error.general}
                   </p>
                 )}
 
-                {/* Full Name */}
-                <div className="flex flex-col gap-.5">
-                  <p className="font-titleFont text-base font-semibold text-gray-600">
+                {/* ================= Full Name ================= */}
+
+                <div className="mb-5">
+
+                  <label className="block mb-2 text-gray-700 font-medium">
                     Full Name
-                  </p>
-                  <input
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    type="text"
-                    placeholder="John Doe"
-                    className="w-full h-8 placeholder:text-sm placeholder:tracking-wide px-4 text-base font-medium placeholder:font-normal rounded-md border border-gray-400 outline-none"
-                  />
+                  </label>
+
+                  <div className="relative">
+
+                    <input
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="John Doe"
+                      className="w-full h-14 rounded-xl border border-gray-300 px-5 outline-none focus:border-[#C79D17]"
+                    />
+
+                  </div>
+
                   {error.name && (
-                    <p className="text-sm text-red-500 font-titleFont font-semibold px-4">
+                    <p className="text-red-500 text-sm mt-2">
                       {error.name}
                     </p>
                   )}
+
                 </div>
 
-                {/* Email */}
-                <div className="flex flex-col gap-.5 mt-3">
-                  <p className="font-titleFont text-base font-semibold text-gray-600">
+                {/* ================= Email ================= */}
+
+                <div className="mb-5">
+
+                  <label className="block mb-2 text-gray-700 font-medium">
                     Email
-                  </p>
-                  <input
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    type="email"
-                    placeholder="you@example.com"
-                    className="w-full h-8 placeholder:text-sm px-4 text-base rounded-md border border-gray-400 outline-none"
-                  />
+                  </label>
+
+                  <div className="relative">
+
+                    <FaEnvelope className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400" />
+
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="you@example.com"
+                      className="w-full h-14 rounded-xl border border-gray-300 pl-14 pr-5 outline-none focus:border-[#C79D17]"
+                    />
+
+                  </div>
+
                   {error.email && (
-                    <p className="text-sm text-red-500 font-titleFont font-semibold px-4">
+                    <p className="text-red-500 text-sm mt-2">
                       {error.email}
                     </p>
                   )}
+
                 </div>
 
-                {/* Phone */}
-                <div className="flex flex-col gap-.5 mt-3">
-                  <p className="font-titleFont text-base font-semibold text-gray-600">
-                    Phone
-                  </p>
-                  <input
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    type="text"
-                    placeholder="1234567890"
-                    className="w-full h-8 placeholder:text-sm px-4 text-base rounded-md border border-gray-400 outline-none"
-                  />
+                {/* ================= Phone ================= */}
+
+                <div className="mb-5">
+
+                  <label className="block mb-2 text-gray-700 font-medium">
+                    Phone Number
+                  </label>
+
+                  <div className="relative">
+
+                    <FaPhoneAlt className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400" />
+
+                    <input
+                      type="text"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="9876543210"
+                      className="w-full h-14 rounded-xl border border-gray-300 pl-14 pr-5 outline-none focus:border-[#C79D17]"
+                    />
+
+                  </div>
+
                   {error.phone && (
-                    <p className="text-sm text-red-500 font-titleFont font-semibold px-4">
+                    <p className="text-red-500 text-sm mt-2">
                       {error.phone}
                     </p>
                   )}
+
                 </div>
 
-                {/* Password */}
-                <div className="flex flex-col gap-.5 mt-3">
-                  <p className="font-titleFont text-base font-semibold text-gray-600">
+                {/* ================= Password Starts Here ================= */}
+                {/* ================= Password ================= */}
+
+                <div className="mb-5">
+                  <label className="block mb-2 text-gray-700 font-medium">
                     Password
-                  </p>
-                  <input
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    type="password"
-                    placeholder="Create password"
-                    className="w-full h-8 placeholder:text-sm px-4 text-base rounded-md border border-gray-400 outline-none"
-                  />
+                  </label>
+
+                  <div className="relative">
+                    <FaLock className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400" />
+
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Create password"
+                      className="w-full h-14 rounded-xl border border-gray-300 pl-14 pr-14 outline-none focus:border-[#C79D17]"
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-500"
+                    >
+                      {showPassword ? <FaEyeSlash /> : <FaEye />}
+                    </button>
+                  </div>
+
                   {error.password && (
-                    <p className="text-sm text-red-500 font-titleFont font-semibold px-4">
+                    <p className="text-red-500 text-sm mt-2">
                       {error.password}
                     </p>
                   )}
                 </div>
 
-                {/* Checkbox */}
-                <div className="flex items-start mdl:items-center gap-2 mt-4">
+                {/* ================= Terms ================= */}
+
+                <div className="flex items-start gap-3 mb-6">
                   <input
                     type="checkbox"
                     checked={checked}
                     onChange={() => setChecked(!checked)}
-                    className="w-4 h-4 mt-1 mdl:mt-0 cursor-pointer"
+                    className="mt-1 w-4 h-4 accent-[#C79D17]"
                   />
-                  <p className="text-sm text-primeColor">
-                    I agree to the OREBI{" "}
-                    <span className="text-blue-500">Terms of Service</span> and{" "}
-                    <span className="text-blue-500">Privacy Policy</span>.
+
+                  <p className="text-sm text-gray-600 leading-6">
+                    I agree to the{" "}
+                    <span className="text-[#C79D17] font-medium cursor-pointer">
+                      Terms of Service
+                    </span>{" "}
+                    and{" "}
+                    <span className="text-[#C79D17] font-medium cursor-pointer">
+                      Privacy Policy
+                    </span>.
                   </p>
                 </div>
 
+                {/* ================= Create Button ================= */}
+
                 <button
                   type="submit"
-                  className={`${checked
-                      ? "bg-primeColor hover:bg-black hover:text-white cursor-pointer"
-                      : "bg-gray-500 cursor-not-allowed"
-                    } w-full text-gray-200 text-base font-medium h-10 rounded-md mt-4 transition duration-300`}
+                  disabled={!checked}
+                  className={`w-full h-14 rounded-xl text-xl font-semibold transition ${checked
+                    ? "bg-black text-[#C79D17] hover:bg-neutral-900"
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    }`}
                 >
-                  Create Account
+                  Create Account →
                 </button>
 
-                <p className="text-sm text-center font-titleFont font-medium mt-3">
+                {/* ================= OR Divider ================= */}
+
+                <div className="flex items-center gap-4 my-8">
+                  <div className="flex-1 h-px bg-gray-300"></div>
+
+                  <span className="text-gray-500 font-medium">
+                    OR
+                  </span>
+
+                  <div className="flex-1 h-px bg-gray-300"></div>
+                </div>
+
+                {/* ================= Social Buttons ================= */}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                  <button
+                    type="button"
+                    className="h-14 rounded-xl border border-gray-300 hover:border-[#C79D17] transition flex items-center justify-center gap-3"
+                  >
+                    <FcGoogle size={24} />
+                    Continue with Google
+                  </button>
+
+                  <button
+                    type="button"
+                    className="h-14 rounded-xl border border-gray-300 hover:border-[#C79D17] transition flex items-center justify-center gap-3"
+                  >
+                    <FaPhoneAlt />
+                    Continue with Phone
+                  </button>
+
+                </div>
+
+                {/* ================= Login Link ================= */}
+
+                <p className="text-center text-gray-600 mt-8">
                   Already have an account?{" "}
-                  <Link to="/login">
-                    <span className="hover:text-blue-600 duration-300">
-                      Sign in
-                    </span>
-                  </Link>
+                  <span
+                    onClick={() => navigate("/login")}
+                    className="text-[#C79D17] font-semibold cursor-pointer hover:underline"
+                  >
+                    Sign In
+                  </span>
                 </p>
-              </div>
-            </form>
-          )}
+
+              </form>
+
+            )}
+          </div>
         </div>
       </div>
-      <Footer />
-      <BottomNav />
+
+      {/* <Footer /> */}
+      {/* <BottomNav /> */}
     </>
   );
 };

@@ -10,7 +10,7 @@ const ShopSideNav = ({ onPriceSelect }) => {
       <Category />
       {/* <Color /> */}
       {/* <Brand /> */}
-      <Price onPriceSelect={onPriceSelect} />  {/* ✅ Pass prop */}
+      {/* <Price onPriceSelect={onPriceSelect} />  ✅ Pass prop this is the price filter*/}
     </div>
   );
 };

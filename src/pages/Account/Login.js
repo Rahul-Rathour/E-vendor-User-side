@@ -1,7 +1,14 @@
 import React, { useState } from 'react';
-import { useCart } from '../../context/CartContext'; 
+import { useCart } from '../../context/CartContext';
 import { useNavigate } from 'react-router-dom';
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import {
+  FaEye,
+  FaEyeSlash,
+  FaEnvelope,
+  FaLock,
+  FaPhoneAlt,
+} from "react-icons/fa";
+import { FcGoogle } from "react-icons/fc";
 import Header from '../../components/home/Header/Header';
 import logonew from '../../assets/images/logonew.jpg';
 import Footer from '../../components/home/Footer/Footer';
@@ -20,10 +27,10 @@ const Login = () => {
     try {
       const res = await api.post('/login', { email, password });
       if (res.data.status) {
-        localStorage.setItem('userToken', res.data.token); 
+        localStorage.setItem('userToken', res.data.token);
         refreshToken();
-        localStorage.setItem('user', JSON.stringify(res.data.user)); 
-        localStorage.setItem('orderType', "general_price"); 
+        localStorage.setItem('user', JSON.stringify(res.data.user));
+        localStorage.setItem('orderType', "general_price");
         navigate('/');
       }
       else {
@@ -40,89 +47,180 @@ const Login = () => {
 
   return (
     <>
-      {/* Header added at top */}
-      <Header />
+      {/* <Header /> */}
 
-      <div className="flex flex-col min-h-screen bg-white">
-        {/* Login layout */}
-        <div className="flex flex-col md:flex-row flex-1">
-          {/* Left Purple Panel */}
-          <div className="bg-purple-700 text-white md:w-1/2 p-10 flex flex-col justify-center items-start space-y-6">
-            <h2 className="text-4xl font-bold">Login</h2>
-            <p className="text-lg">
-              Get access to your Orders, Wishlist and Recommendations
-              <img
-                src={logonew}
-                alt="Login illustration"
-                className="w-72 mt-4"
-              />
-            </p>
+      <div className="min-h-screen bg-white">
+        <div className="flex flex-col lg:flex-row min-h-screen">
+          {/* Left Banner */}
+          <div className="relative lg:w-1/2 bg-black overflow-hidden">
+            <img
+              src={logonew}
+              alt="Login Banner"
+              className="absolute inset-0 w-full h-full object-cover opacity-60"
+            />
+
+            <div className="absolute inset-0 bg-gradient-to-r from-black/90 to-black/40"></div>
+
+            <div className="relative z-10 flex flex-col justify-center h-full px-8 md:px-16 py-16 text-white">
+              <p className="uppercase tracking-[8px] text-[#C79D17] text-sm md:text-lg mb-4">
+                Welcome Back
+              </p>
+
+              <h1 className="text-5xl md:text-7xl font-bold mb-4">
+                Login
+              </h1>
+
+              <div className="w-20 h-[2px] bg-[#C79D17] mb-6"></div>
+
+              <p className="text-lg md:text-2xl leading-relaxed max-w-md">
+                Get access to your Orders,
+                <br />
+                Wishlist and Recommendations
+              </p>
+            </div>
           </div>
 
-          {/* Right Form Area */}
-          <div className="md:w-1/2 flex items-center justify-center bg-white p-8">
-            <div className="w-full max-w-sm space-y-6">
-              <h2 className="text-2xl font-bold text-gray-800 text-center">
+          {/* Right Form */}
+          <div className="lg:w-1/2 flex items-center justify-center px-6 py-12 bg-white">
+            <div className="w-full max-w-xl">
+
+              <h2 className="text-5xl font-serif text-center text-gray-900">
                 Welcome Back
               </h2>
-              <p className="text-sm text-center text-gray-500">
+
+              <div className="flex justify-center items-center gap-4 mt-4">
+                <div className="w-14 h-px bg-[#C79D17]"></div>
+
+                <img
+                  src={logonew}
+                  alt=""
+                  className="w-8 h-8 object-contain"
+                />
+
+                <div className="w-14 h-px bg-[#C79D17]"></div>
+              </div>
+
+              <p className="text-center text-gray-500 mt-4 mb-10">
                 Login to your account
               </p>
 
-              <form onSubmit={handleLogin} className="space-y-4" autoComplete="off">
+              <form
+                onSubmit={handleLogin}
+                className="space-y-6"
+                autoComplete="off"
+              >
+                {/* Email */}
+
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Email</label>
-                  <input
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
-                    placeholder="you@example.com"
-                  />
+                  <label className="block mb-2 text-gray-700 font-medium">
+                    Email
+                  </label>
+
+                  <div className="relative">
+                    <FaEnvelope className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400" />
+
+                    <input
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="you@example.com"
+                      className="w-full h-14 rounded-xl border border-gray-300 pl-14 pr-4 outline-none focus:border-[#C79D17]"
+                    />
+                  </div>
                 </div>
 
-                <div className="relative">
-                  <label className="block text-sm font-medium text-gray-700">Password</label>
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
-                    placeholder="••••••••"
-                  />
-                  <span
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-10 text-gray-400 cursor-pointer"
-                    title="Show/Hide Password"
-                  >
-                    {showPassword ? <FaEyeSlash /> : <FaEye />}
-                  </span>
+                {/* Password */}
+
+                <div>
+                  <label className="block mb-2 text-gray-700 font-medium">
+                    Password
+                  </label>
+
+                  <div className="relative">
+                    <FaLock className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400" />
+
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="w-full h-14 rounded-xl border border-gray-300 pl-14 pr-14 outline-none focus:border-[#C79D17]"
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-500"
+                    >
+                      {showPassword ? <FaEyeSlash /> : <FaEye />}
+                    </button>
+                  </div>
                 </div>
 
-                <div className="flex justify-between items-center text-sm">
+                {/* Forgot Password */}
+
+                <div className="flex justify-end">
                   <button
                     type="button"
                     onClick={handleForgotPassword}
-                    className="text-purple-600 hover:underline"
+                    className="text-[#A9781B] hover:underline"
                   >
                     Forgot Password?
                   </button>
                 </div>
 
+                {/* Login */}
+
                 <button
                   type="submit"
-                  className="w-full py-2 px-4 bg-primeColor text-white font-semibold rounded-md hover:bg-purple-800 transition duration-300"
+                  className="w-full h-14 rounded-xl bg-black text-[#C79D17] text-xl font-semibold hover:bg-neutral-900 transition"
                 >
-                  Login
+                  Login →
                 </button>
 
-                <p className="text-sm text-center text-gray-600">
-                  Don’t have an account?{' '}
+                {/* OR */}
+
+                <div className="flex items-center gap-4">
+                  <div className="flex-1 h-px bg-gray-300"></div>
+
+                  <span className="text-gray-500 font-medium">
+                    OR
+                  </span>
+
+                  <div className="flex-1 h-px bg-gray-300"></div>
+                </div>
+
+                {/* Google */}
+
+                <button
+                  type="button"
+                  className="w-full h-14 rounded-xl border border-gray-300 hover:border-[#C79D17] flex items-center justify-center gap-3 transition"
+                >
+                  <FcGoogle size={24} />
+
+                  Continue with Google
+                </button>
+
+                {/* Phone */}
+
+                <button
+                  type="button"
+                  className="w-full h-14 rounded-xl border border-gray-300 hover:border-[#C79D17] flex items-center justify-center gap-3 transition"
+                >
+                  <FaPhoneAlt />
+
+                  Continue with Phone (OTP)
+                </button>
+
+                {/* Signup */}
+
+                <p className="text-center text-gray-600 pt-2">
+                  Don't have an account?{" "}
                   <span
-                    onClick={() => navigate('/signup')}
-                    className="text-blue-600 hover:underline cursor-pointer"
+                    onClick={() => navigate("/signup")}
+                    className="text-[#C79D17] cursor-pointer font-semibold hover:underline"
                   >
                     Sign Up
                   </span>
@@ -133,9 +231,8 @@ const Login = () => {
         </div>
       </div>
 
-      {/* Footer at bottom */}
-      <Footer />
-      <BottomNav/>
+      {/* <Footer /> */}
+      {/* <BottomNav /> */}
     </>
   );
 };

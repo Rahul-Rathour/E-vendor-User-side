@@ -1,6 +1,7 @@
 import logo from "./logonew.jpg";
 import logoLight from "./logoLight.png";
-import bannerImgOne from "./banner/bannerImgOne.png";
+import right from "./right.png"
+import bannerImgOne from "./banner/bannerImgOne.png"; 
 import bannerImgTwo from "./banner/bannerImgTwo.png";
 import bannerImgThree from "./banner/bannerImgThree.png"; 
 import saleImgOne from "./sale/saleImgOne.webp";
@@ -34,6 +35,7 @@ import emptyCart from "../images/emptyCart.png";
 export {
   logo,
   logoLight,
+  right,
   bannerImgOne,
   bannerImgTwo,
   bannerImgThree,

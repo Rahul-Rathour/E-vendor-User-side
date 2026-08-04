@@ -1,34 +1,65 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useCart } from "../../context/CartContext";
 import { toast } from "react-toastify";
-import Breadcrumbs from "../../components/pageProps/Breadcrumbs";
+import api from "../../api";
+
+import CheckoutHeader from "./CheckoutHeader";
+import CheckoutOrderItem from "./CheckoutOrderItem";
+import ShippingAddressCard from "./ShippingAddressCard";
+import PaymentMethodCard from "./PaymentMethodCard";
+import CheckoutFeatures from "./CheckoutFeatures";
+import CheckoutOrderSummary from "./CheckoutOrderSummary";
 
 const CheckoutPage = () => {
-  const { state } = useLocation(); 
   const navigate = useNavigate();
-  const { checkout } = useCart();
+  const location = useLocation();
+
+  const {
+    cart = [],
+    totalAmt = 0,
+    finalTotal = 0,
+    discountAmount = 0,
+    selectedCoupon = null,
+  } = location.state || {};
 
   const [shippingAddress, setShippingAddress] = useState("");
-  const [usergst, setUsergst] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("COD");
+  const [usergst, setUsergst] = useState("");
 
-  if (!state) {
-    return <p className="text-center mt-20 text-xl">No checkout data found.</p>;
-  }
+  const user = JSON.parse(localStorage.getItem("user"));
 
-  const { totalAmt, finalTotal, cart, discountAmount, selectedCoupon } = state;
+  useEffect(() => {
+    if (!user) {
+      toast.error("Please login first");
+      navigate("/login");
+    }
+  }, [navigate, user]);
 
   const calculateGSTAmount = (item) => {
     const price = item.product.price * item.quantity;
-    return (price * (item.product.gst || 0)) / 100;
+    return (price * item.product.gst) / 100;
   };
 
-  const totalGST = cart.reduce((sum, item) => sum + calculateGSTAmount(item), 0);
+  const totalGST = cart.reduce(
+    (sum, item) => sum + calculateGSTAmount(item),
+    0
+  );
 
+  const subtotal = cart.reduce(
+    (sum, item) => sum + item.product.price * item.quantity,
+    0
+  );
 
-  const generateOrderNumber = () => "ORD-" + Math.random().toString(36).substring(2, 10).toUpperCase();
-  const order_number = generateOrderNumber();
+  const shippingCharge = subtotal >= 999 ? 0 : 99;
+
+  const grandTotal =
+    subtotal +
+    totalGST +
+    shippingCharge -
+    Number(discountAmount || 0);
+  // ==========================================
+  // PLACE ORDER
+  // ==========================================
 
   const handleConfirmCheckout = async () => {
     if (!shippingAddress.trim()) {
@@ -36,214 +67,239 @@ const CheckoutPage = () => {
       return;
     }
 
-    if (paymentMethod === "COD") {
-      const success = await checkout(
-        shippingAddress,
-        "COD",
-        order_number,
-        totalAmt,           // mrp 
-        // finalTotal,        // send FINAL amount
-        discountAmount,
-        selectedCoupon?.code || "none",
-        usergst
-      );
-      if (success) {
-        navigate("/orderSuccess", {
-          state: { totalAmt: finalTotal, discountAmount, totalAmt, shippingAddress, cart, order_number },
-        });
+    if (!user) {
+      toast.error("Please login first");
+      navigate("/login");
+      return;
+    }
+
+    try {
+      // ================= COD =================
+
+      if (paymentMethod === "COD") {
+        const payload = {
+          user_id: user.id,
+          shipping_address: shippingAddress,
+          payment_method: "COD",
+          gst_number: usergst,
+          coupon_id: selectedCoupon?.id || null,
+          discount_amount: Number(discountAmount || 0),
+          total_amount: grandTotal,
+        };
+
+        const res = await api.post("/checkout", payload);
+
+        if (res.data.status) {
+          toast.success("Order placed successfully");
+
+          // If you already have this function
+          // keep it, otherwise remove this line
+          // if (typeof sendOrderConfirmationEmail === "function") {
+          //   await sendOrderConfirmationEmail();
+          // }
+
+          navigate("/order-success", {
+            state: {
+              order: res.data.data,
+            },
+          });
+        } else {
+          toast.error(res.data.message || "Checkout failed");
+        }
+
+        return;
       }
-    } else {
-      navigate("/razorpay", {
-        state: { finalTotal, discountAmount, cart, shippingAddress, paymentMethod: "Online", order_number },
+
+      // ================= ONLINE PAYMENT =================
+
+      const orderRes = await api.post("/razorpay/order", {
+        amount: grandTotal,
       });
+
+      const options = {
+        key: process.env.REACT_APP_RAZORPAY_KEY,
+
+        amount: orderRes.data.amount,
+
+        currency: orderRes.data.currency,
+
+        name: "Your Store",
+
+        description: "Order Payment",
+
+        order_id: orderRes.data.id,
+
+        handler: async function (response) {
+          try {
+            const verify = await api.post("/checkout", {
+              user_id: user.id,
+              shipping_address: shippingAddress,
+              payment_method: "Online",
+              gst_number: usergst,
+
+              razorpay_order_id:
+                response.razorpay_order_id,
+
+              razorpay_payment_id:
+                response.razorpay_payment_id,
+
+              razorpay_signature:
+                response.razorpay_signature,
+
+              coupon_id: selectedCoupon?.id || null,
+
+              discount_amount: Number(
+                discountAmount || 0
+              ),
+
+              total_amount: grandTotal,
+            });
+
+            if (verify.data.status) {
+              toast.success("Payment Successful");
+
+              // if (
+              //   typeof sendOrderConfirmationEmail ===
+              //   "function"
+              // ) {
+              //   await sendOrderConfirmationEmail();
+              // }
+
+              navigate("/order-success", {
+                state: {
+                  order: verify.data.data,
+                },
+              });
+            } else {
+              toast.error(
+                verify.data.message ||
+                "Payment verification failed"
+              );
+            }
+          } catch (err) {
+            console.log(err);
+
+            toast.error(
+              "Payment verification failed."
+            );
+          }
+        },
+
+        prefill: {
+          name: user?.name,
+
+          email: user?.email,
+
+          contact: user?.phone,
+        },
+
+        theme: {
+          color: "#D4AF37",
+        },
+      };
+
+      const razorpay = new window.Razorpay(options);
+
+      razorpay.open();
+    } catch (err) {
+      console.log(err);
+
+      toast.error("Checkout failed");
     }
   };
-
   return (
-    <div className="max-w-container mx-auto px-4 min-h-screen bg-gray-50">
-      <Breadcrumbs title="Checkout" />
+    <div className="bg-[#FAFAFA] min-h-screen">
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-6">
+      {/* Header */}
 
-        {/* ==================== ORDER SUMMARY ==================== */}
-        <div className="lg:col-span-7">
-          <div className="bg-white rounded-3xl shadow p-5 md:p-8">
-            <h2 className="text-2xl font-semibold mb-6 text-gray-800">Order Summary</h2>
+      <CheckoutHeader />
 
-            <div className="space-y-6">
-              {cart.map((item) => {
-                const gstAmount = calculateGSTAmount(item);
-                return (
-                  <div
+      <div className="max-w-[1400px] mx-auto px-4 pb-20">
+
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
+
+          {/* ===========================
+                LEFT SECTION
+          =========================== */}
+
+          <div className="xl:col-span-8 space-y-8">
+
+            {/* Order Items */}
+
+            <div className="bg-white rounded-2xl border shadow-sm overflow-hidden">
+
+              <div className="px-8 py-6 border-b">
+
+                <h2 className="text-2xl font-bold">
+                  Order Items
+                </h2>
+
+              </div>
+
+              <div className="divide-y">
+
+                {cart.map((item) => (
+
+                  <CheckoutOrderItem
                     key={item.id}
-                    className="flex flex-col sm:flex-row gap-4 border-b pb-6 last:border-b-0"
-                  >
-                    {/* Image */}
-                    <img
-                      src={`${process.env.REACT_APP_API_URL}/public/${item.product.image}`}
-                      alt={item.product.name}
-                      className="w-24 h-24 sm:w-28 sm:h-28 object-cover rounded-xl flex-shrink-0"
-                    />
+                    item={item}
+                    calculateGSTAmount={calculateGSTAmount}
+                  />
 
-                    {/* Product Details */}
-                    <div className="flex-1 min-w-0"> {/* min-w-0 prevents text overflow */}
-                      <h3 className="font-semibold text-lg leading-tight break-words">
-                        {item.product.name}
-                      </h3>
+                ))}
 
-                      {/* Color & Size - Responsive */}
-                      <div className="flex flex-wrap items-center gap-x-5 gap-y-1 mt-2 text-sm text-gray-600">
-                        <div className="flex items-center gap-2">
-                          <span>Color:</span>
-                          <div className="flex items-center gap-1.5">
-                            <div
-                              className="w-5 h-5 rounded-full border border-gray-300 shadow-sm"
-                              style={{ backgroundColor: item.color?.color_code || "#ccc" }}
-                            />
-                            <span className="font-medium">{item.color?.color_name}</span>
-                          </div>
-                        </div>
+              </div>
 
-                        <div className="flex items-center gap-2">
-                          <span>Size:</span>
-                          <span className="font-semibold px-3 py-0.5 bg-gray-100 rounded-lg">
-                            {item.size}
-                          </span>
-                        </div>
-                      </div>
-
-                      <p className="text-gray-600 mt-2">
-                        ₹{item.product.price} × {item.quantity}
-                      </p>
-                    </div>
-
-                    {/* Price Section */}
-                    <div className="text-right sm:text-right mt-2 sm:mt-0">
-                      <p className="font-semibold text-lg">
-                        ₹{(item.product.price * item.quantity).toFixed(2)}
-                      </p>
-                      {gstAmount > 0 && (
-                        <p className="text-xs text-gray-500">
-                          + GST ₹{gstAmount.toFixed(2)}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
             </div>
 
-            {/* Totals */}
-            <div className="mt-8 pt-6 border-t space-y-4">
-              <div className="flex justify-between text-lg">
-                <span className="text-gray-600">MRP+gst</span>
-                <span>₹{(totalAmt).toFixed(2)}</span>
-                {/* <span>₹{(finalTotal).toFixed(2)}</span> */}
-              </div>
-              <div className="flex justify-between text-lg">
-                <span className="text-gray-600">Total GST</span>
-                <span>₹{totalGST.toFixed(2)}</span>
-              </div>
-              
-              <div className="flex justify-between text-lg">
-                <span className="text-gray-600">Coupon Discount</span>
-                <span>₹{discountAmount.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between text-lg">
-                <span className="text-gray-600">Selected Coupon</span>
-                <span>
-                  {selectedCoupon ? selectedCoupon.code : "No Coupon Applied"}
-                </span>
-              </div>
-              <div className="flex justify-between text-lg">
-                <span className="text-gray-600">Total Amount</span>
-                <span>₹{finalTotal.toFixed(2)}</span> 
-              </div>
-              <div className="flex justify-between text-2xl font-bold border-t pt-4 text-primeColor">
-                <span>Grand Total</span>
-                <span>₹{(finalTotal).toFixed(2)}</span>
-                {/* <span>discount amount</span> */}
-                {/* <span>{discountAmount}</span>  */}
-              </div>
-            </div>
+            {/* Shipping Address */}
+
+            <ShippingAddressCard
+              shippingAddress={shippingAddress}
+              setShippingAddress={setShippingAddress}
+              usergst={usergst}
+              setUsergst={setUsergst}
+            />
+
+            {/* Payment */}
+
+            <PaymentMethodCard
+              paymentMethod={paymentMethod}
+              setPaymentMethod={setPaymentMethod}
+            />
+
+            {/* Features */}
+
+            <CheckoutFeatures />
+
           </div>
+
+          {/* ===========================
+                RIGHT SIDEBAR
+          =========================== */}
+
+          <div className="xl:col-span-4">
+
+            <div className="sticky top-8">
+
+              <CheckoutOrderSummary
+                cart={cart}
+                subtotal={subtotal}
+                totalGST={totalGST}
+                shippingCharge={shippingCharge}
+                totalAmt={totalAmt}
+                grandTotal={grandTotal}
+                discountAmount={discountAmount}
+                selectedCoupon={selectedCoupon}
+                handleConfirmCheckout={handleConfirmCheckout}
+              />
+
+            </div>
+
+          </div>
+
         </div>
 
-        {/* ==================== SHIPPING & PAYMENT ==================== */}
-        <div className="lg:col-span-5">
-          <div className="bg-white rounded-3xl shadow p-6 md:p-8 sticky top-6">
-            <h2 className="text-2xl font-semibold mb-6">Shipping & Payment</h2>
-
-            <div className="mb-8">
-              <label className="block text-gray-700 font-medium mb-2">
-                Shipping Address <span className="text-red-500">*</span>
-              </label>
-              <textarea
-                className="w-full border border-gray-300 rounded-2xl p-4 focus:ring-2 focus:ring-primeColor focus:border-transparent outline-none h-36 resize-y"
-                placeholder="House No, Street, Area, City, State, Pincode..."
-                value={shippingAddress}
-                onChange={(e) => setShippingAddress(e.target.value)}
-              />
-            </div>
-            <div className="mb-8">
-              <label className="block text-gray-700 font-medium mb-2">
-                GST No.
-              </label>
-              <input
-                className="w-full border border-gray-300 rounded-2xl p-4 focus:ring-2 focus:ring-primeColor focus:border-transparent outline-none resize-y"
-                placeholder="Your gst no..."
-                value={usergst}
-                onChange={(e) => setUsergst(e.target.value)}
-              />
-            </div>
-
-            <div className="mb-8">
-              <p className="text-gray-700 font-medium mb-3">Payment Method</p>
-              <div className="space-y-3">
-                <label className="flex items-center gap-3 border p-4 rounded-2xl cursor-pointer hover:bg-gray-50 transition-all">
-                  <input
-                    type="radio"
-                    name="payment"
-                    value="COD"
-                    checked={paymentMethod === "COD"}
-                    onChange={() => setPaymentMethod("COD")}
-                    className="w-5 h-5 accent-primeColor"
-                  />
-                  <div>
-                    <p className="font-medium">Cash on Delivery (COD)</p>
-                    <p className="text-sm text-gray-500">Pay when product is delivered</p>
-                  </div>
-                </label>
-
-                <label className="flex items-center gap-3 border p-4 rounded-2xl cursor-pointer hover:bg-gray-50 transition-all">
-                  <input
-                    type="radio"
-                    name="payment"
-                    value="Online"
-                    checked={paymentMethod === "Online"}
-                    onChange={() => setPaymentMethod("Online")}
-                    className="w-5 h-5 accent-primeColor"
-                  />
-                  <div>
-                    <p className="font-medium">Online Payment (Razorpay)</p>
-                    <p className="text-sm text-gray-500">Secure payment gateway</p>
-                  </div>
-                </label>
-              </div>
-            </div>
-
-            <button
-              onClick={handleConfirmCheckout}
-              className="w-full bg-primeColor hover:bg-black text-white py-4 rounded-2xl text-lg font-semibold transition-all duration-300"
-            >
-              Confirm & Place Order
-            </button>
-
-            <p className="text-center text-xs text-gray-500 mt-5">
-              You can review this order before it is shipped
-            </p>
-          </div>
-        </div>
       </div>
     </div>
   );

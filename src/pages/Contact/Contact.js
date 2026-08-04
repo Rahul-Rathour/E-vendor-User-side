@@ -5,6 +5,7 @@ import api from "../../api";
 
 const Contact = () => {
   const location = useLocation();
+  const [company, setCompany] = useState({});
   const [prevLocation, setPrevLocation] = useState("Home"); // default fallback
   const [loading, setLoading] = useState(false);
 
@@ -15,6 +16,19 @@ const Contact = () => {
       setPrevLocation("Home");
     }
   }, [location]);
+
+  useEffect(() => {
+    const fetchCompanyDetails = async () => {
+      try {
+        const res = await api.get("/home-setting");
+        setCompany(res.data || {});
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchCompanyDetails();
+  }, []);
 
   const [clientName, setclientName] = useState("");
   const [email, setEmail] = useState("");
@@ -106,95 +120,206 @@ const Contact = () => {
     }
   };
 
- return (
-  <div className="max-w-container mx-auto px-4 min-h-screen bg-gray-50 overflow-x-hidden">
-    <Breadcrumbs title="Contact" prevLocation={prevLocation} />
+  return (
+    <div className="max-w-container mx-auto px-4 bg-gray-50 min-h-screen">
+      <Breadcrumbs title="Contact" prevLocation={prevLocation} />
 
-    {successMsg ? (
-      <p className="pb-20 w-full max-w-md font-medium text-green-500">
-        {successMsg}
-      </p>
-    ) : (
-      <form className="pb-20" onSubmit={handlePost}>
-        <h1 className="font-titleFont font-semibold text-2xl md:text-3xl">
-          Fill up a Form
-        </h1>
+      {successMsg ? (
+        <p className="pb-20 max-w-md text-green-600 font-medium">
+          {successMsg}
+        </p>
+      ) : (
+        <div className="pb-20">
+          <h1 className="text-3xl font-titleFont font-bold mb-10">
+            Get In Touch
+          </h1>
 
-        <div className="w-full max-w-[500px] h-auto py-6 flex flex-col gap-6">
-          {/* Name Field */}
-          <div>
-            <p className="text-base font-titleFont font-semibold px-2">
-              Name
-            </p>
-            <input
-              onChange={handleName}
-              value={clientName}
-              className="w-full py-1 border-b-2 px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none focus-within:border-primeColor"
-              type="text"
-              placeholder="Enter your name here"
-            />
-            {errClientName && (
-              <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
-                <span className="text-sm italic font-bold">!</span>
-                {errClientName}
-              </p>
-            )}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+
+            {/* ================= Contact Form ================= */}
+
+            <form onSubmit={handlePost}>
+              <div className="bg-white rounded-lg shadow-md p-8">
+
+                <h2 className="text-2xl font-semibold mb-6">
+                  Send us a Message
+                </h2>
+
+                <div className="space-y-6">
+
+                  {/* Name */}
+
+                  <div>
+                    <label className="block font-semibold mb-2">
+                      Name
+                    </label>
+
+                    <input
+                      type="text"
+                      value={clientName}
+                      onChange={handleName}
+                      placeholder="Enter your name"
+                      className="w-full border rounded-md p-3 outline-none focus:border-primeColor"
+                    />
+
+                    {errClientName && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errClientName}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Email */}
+
+                  <div>
+                    <label className="block font-semibold mb-2">
+                      Email
+                    </label>
+
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={handleEmail}
+                      placeholder="Enter your email"
+                      className="w-full border rounded-md p-3 outline-none focus:border-primeColor"
+                    />
+
+                    {errEmail && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errEmail}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Message */}
+
+                  <div>
+                    <label className="block font-semibold mb-2">
+                      Message
+                    </label>
+
+                    <textarea
+                      rows={5}
+                      value={messages}
+                      onChange={handleMessages}
+                      placeholder="Write your message..."
+                      className="w-full border rounded-md p-3 outline-none resize-none focus:border-primeColor"
+                    />
+
+                    {errMessages && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errMessages}
+                      </p>
+                    )}
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="bg-primeColor text-white px-8 py-3 rounded hover:bg-black duration-300 disabled:opacity-60"
+                  >
+                    {loading ? "Sending..." : "Send Message"}
+                  </button>
+
+                </div>
+              </div>
+            </form>
+
+            {/* ================= Company Details ================= */}
+
+            <div className="bg-white rounded-lg shadow-md p-8 h-fit">
+
+              <h2 className="text-2xl font-semibold mb-8">
+                Contact Information
+              </h2>
+
+              <div className="space-y-8">
+
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-full bg-primeColor text-white flex items-center justify-center text-xl">
+                    📍
+                  </div>
+
+                  <div>
+                    <h4 className="font-semibold text-lg">
+                      Address
+                    </h4>
+
+                    <p className="text-gray-600 leading-7">
+                      {company.address}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-full bg-primeColor text-white flex items-center justify-center text-xl">
+                    📞
+                  </div>
+
+                  <div>
+                    <h4 className="font-semibold text-lg">
+                      Phone
+                    </h4>
+
+                    <a
+                      href={`tel:${company.mobile}`}
+                      className="text-gray-600 hover:text-primeColor"
+                    >
+                      {company.mobile}
+                    </a>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-full bg-primeColor text-white flex items-center justify-center text-xl">
+                    ✉️
+                  </div>
+
+                  <div>
+                    <h4 className="font-semibold text-lg">
+                      Email
+                    </h4>
+
+                    <a
+                      href={`mailto:${company.email}`}
+                      className="text-gray-600 hover:text-primeColor"
+                    >
+                      {company.email}
+                    </a>
+                  </div>
+                </div>
+
+                {company.website && (
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-full bg-primeColor text-white flex items-center justify-center text-xl">
+                      🌐
+                    </div>
+
+                    <div>
+                      <h4 className="font-semibold text-lg">
+                        Website
+                      </h4>
+
+                      <a
+                        href={company.website}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-primeColor break-all"
+                      >
+                        {company.website}
+                      </a>
+                    </div>
+                  </div>
+                )}
+
+              </div>
+            </div>
+
           </div>
-
-          {/* Email Field */}
-          <div>
-            <p className="text-base font-titleFont font-semibold px-2">
-              Email
-            </p>
-            <input
-              onChange={handleEmail}
-              value={email}
-              className="w-full py-1 border-b-2 px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none focus-within:border-primeColor"
-              type="email"
-              placeholder="Enter your email here"
-            />
-            {errEmail && (
-              <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
-                <span className="text-sm italic font-bold">!</span>
-                {errEmail}
-              </p>
-            )}
-          </div>
-
-          {/* Message Field */}
-          <div>
-            <p className="text-base font-titleFont font-semibold px-2">
-              Messages
-            </p>
-            <textarea
-              onChange={handleMessages}
-              value={messages}
-              cols="30"
-              rows="3"
-              className="w-full py-1 border-b-2 px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none focus-within:border-primeColor resize-none"
-              placeholder="Enter your message here"
-            />
-            {errMessages && (
-              <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
-                <span className="text-sm italic font-bold">!</span>
-                {errMessages}
-              </p>
-            )}
-          </div>
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full sm:w-44 bg-primeColor text-gray-200 h-10 font-titleFont text-base tracking-wide font-semibold hover:bg-black hover:text-white duration-200 disabled:opacity-50"
-          >
-            {loading ? "Sending..." : "Post"}
-          </button>
         </div>
-      </form>
-    )}
-  </div>
-);
+      )}
+    </div>
+  );
 };
 
 export default Contact;

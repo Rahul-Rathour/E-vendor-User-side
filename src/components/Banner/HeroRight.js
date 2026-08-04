@@ -1,14 +1,14 @@
 import React from "react";
-import { logo, logoLight } from "../../assets/images";
+import { logo, right } from "../../assets/images";
 
 const HeroRight = () => {
   return (
-    <div className="relative hidden lg:flex items-end justify-end h-full">
+    <div className="relative hidden lg:flex items-center justify-center h-full">
 
       {/* Model */}
 
       <img
-        src={logoLight}
+        src={right}
         alt="Black Hewzen Model"
         className="
           relative

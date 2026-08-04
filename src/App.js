@@ -31,7 +31,7 @@ import Payment from "./pages/payment/Payment";
 import ProductDetails from "./pages/ProductDetails/ProductDetails";
 import Shop from "./pages/Shop/Shop";
 import Login from "./pages/Account/Login";
-import Wishlist from "./pages/Cart/Wishlist";
+// import Wishlist from "./pages/Cart/Wishlist";
 import Myprofile from "./pages/Account/Myprofile";
 import ManageAddress from "./pages/Account/ManageAddress";
 import AccountLayout from "./pages/Account/AccountLayout";
@@ -63,6 +63,8 @@ import ShippingPolicy from "./pages/ShippingPolicy";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsConditions from "./pages/TermsConditions";
 import NewArrivals from "./components/home/NewArrivals/NewArrivals";
+import Wishlist from "./pages/Wishlist/Wishlist";
+import MyOrders from "./pages/Orders/MyOrders";
 
 
 
@@ -119,11 +121,11 @@ const router = createBrowserRouter(
         <Route path="/track/:id" element={<Track />} />
         <Route path="/product/:id" element={<ProductDetails />} />
         <Route path="/new-arrivals" element={<NewArrivals />} />
+        <Route path="/login" element={<Login />}></Route>
+        <Route path="/signup" element={<SignUp />}></Route>
+      <Route path="/order" element={<MyOrders />} />
       </Route>
-      <Route path="/signup" element={<SignUp />}></Route>
-      <Route path="/login" element={<Login />}></Route>
       <Route path="/signin" element={<SignIn />}></Route>
-      <Route path="/order" element={<Myorder />} />
       <Route path="/order-details/:id" element={<OrderDetails />} />
       <Route path="/mobile-account" element={<MobileAccount />} />
       <Route path="/review" element={<Review />} />

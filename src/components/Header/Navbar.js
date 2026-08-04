@@ -8,31 +8,31 @@ const Navbar = () => {
             title: "Home",
             link: "/",
         },
-        {
-            title: "Men",
-            link: "/category/men",
-            dropdown: true,
-        },
-        {
-            title: "Jackets",
-            link: "/category/jackets",
-        },
-        {
-            title: "T-Shirts",
-            link: "/category/t-shirts",
-        },
-        {
-            title: "Jeans",
-            link: "/category/jeans",
-        },
-        {
-            title: "Lowers",
-            link: "/category/lowers",
-        },
-        {
-            title: "New Arrivals",
-            link: "/new-arrivals",
-        },
+        // {
+        //     title: "Men",
+        //     link: "/category/men",
+        //     dropdown: true,
+        // },
+        // {
+        //     title: "Jackets",
+        //     link: "/category/jackets",
+        // },
+        // {
+        //     title: "T-Shirts",
+        //     link: "/category/t-shirts",
+        // },
+        // {
+        //     title: "Jeans",
+        //     link: "/category/jeans",
+        // },
+        // {
+        //     title: "Lowers",
+        //     link: "/category/lowers",
+        // },
+        // {
+        //     title: "New Arrivals",
+        //     link: "/new-arrivals",
+        // },
         {
             title: "Contact",
             link: "/contact",
