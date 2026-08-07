@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   FiMapPin,
   FiHome,
@@ -11,6 +11,71 @@ const ShippingAddressCard = ({
   usergst,
   setUsergst,
 }) => {
+  const [form, setForm] = useState({
+    house: "",
+    street: "",
+    landmark: "",
+    city: "",
+    state: "",
+    pincode: "",
+  });
+
+  const states = [
+    "Andhra Pradesh",
+    "Arunachal Pradesh",
+    "Assam",
+    "Bihar",
+    "Chhattisgarh",
+    "Goa",
+    "Gujarat",
+    "Haryana",
+    "Himachal Pradesh",
+    "Jharkhand",
+    "Karnataka",
+    "Kerala",
+    "Madhya Pradesh",
+    "Maharashtra",
+    "Manipur",
+    "Meghalaya",
+    "Mizoram",
+    "Nagaland",
+    "Odisha",
+    "Punjab",
+    "Rajasthan",
+    "Sikkim",
+    "Tamil Nadu",
+    "Telangana",
+    "Tripura",
+    "Uttar Pradesh",
+    "Uttarakhand",
+    "West Bengal",
+    "Delhi",
+    "Jammu & Kashmir",
+    "Ladakh",
+    "Chandigarh",
+  ];
+
+  const handleChange = (field, value) => {
+    setForm((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  useEffect(() => {
+    const address = [
+      `House No: ${form.house}`,
+      `Street: ${form.street}`,
+      `Landmark: ${form.landmark}`,
+      `City: ${form.city}`,
+      `State: ${form.state}`,
+      `Pincode: ${form.pincode}`,
+    ]
+      .filter((item) => !item.endsWith(": "))
+      .join(", ");
+
+    setShippingAddress(address);
+  }, [form, setShippingAddress]);
   return (
     <div
       className="
@@ -78,7 +143,7 @@ const ShippingAddressCard = ({
 
           <div className="relative">
 
-            <FiHome
+            {/* <FiHome
               className="
                 absolute
                 left-5
@@ -86,32 +151,127 @@ const ShippingAddressCard = ({
                 text-[#D4AF37]
               "
               size={22}
-            />
+            /> */}
 
-            <textarea
-              rows={6}
-              value={shippingAddress}
-              onChange={(e) =>
-                setShippingAddress(e.target.value)
-              }
-              placeholder="House No, Street, Area, City, State, Pincode..."
-              className="
-                w-full
-                pl-14
-                pr-5
-                py-5
-                rounded-2xl
-                border
-                border-[#E5E5E5]
-                resize-none
-                outline-none
-                transition-all
-                duration-300
-                focus:border-[#D4AF37]
-                focus:ring-4
-                focus:ring-[#D4AF37]/20
-              "
-            />
+            <div className="grid md:grid-cols-2 gap-5">
+
+              {/* House */}
+
+              <div>
+
+                <label className="block mb-2 font-medium">
+                  House No / Flat No *
+                </label>
+
+                <input
+                  value={form.house}
+                  onChange={(e) => handleChange("house", e.target.value)}
+                  className="w-full h-12 border rounded-xl px-4"
+                  placeholder="House No."
+                />
+
+              </div>
+
+              {/* Street */}
+
+              <div>
+
+                <label className="block mb-2 font-medium">
+                  Street / Area *
+                </label>
+
+                <input
+                  value={form.street}
+                  onChange={(e) => handleChange("street", e.target.value)}
+                  className="w-full h-12 border rounded-xl px-4"
+                  placeholder="Street / Area"
+                />
+
+              </div>
+
+              {/* Landmark */}
+
+              <div>
+
+                <label className="block mb-2 font-medium">
+                  Landmark
+                </label>
+
+                <input
+                  value={form.landmark}
+                  onChange={(e) => handleChange("landmark", e.target.value)}
+                  className="w-full h-12 border rounded-xl px-4"
+                  placeholder="Near..."
+                />
+
+              </div>
+
+              {/* City */}
+
+              <div>
+
+                <label className="block mb-2 font-medium">
+                  City *
+                </label>
+
+                <input
+                  value={form.city}
+                  onChange={(e) => handleChange("city", e.target.value)}
+                  className="w-full h-12 border rounded-xl px-4"
+                  placeholder="City"
+                />
+
+              </div>
+
+              {/* State */}
+
+              <div>
+
+                <label className="block mb-2 font-medium">
+                  State *
+                </label>
+
+                <select
+                  value={form.state}
+                  onChange={(e) => handleChange("state", e.target.value)}
+                  className="w-full h-12 border rounded-xl px-4"
+                >
+                  <option value="">
+                    Select State
+                  </option>
+
+                  {states.map((state) => (
+                    <option
+                      key={state}
+                      value={state}
+                    >
+                      {state}
+                    </option>
+                  ))}
+
+                </select>
+
+              </div>
+
+              {/* Pincode */}
+
+              <div>
+
+                <label className="block mb-2 font-medium">
+                  Pincode *
+                </label>
+
+                <input
+                  maxLength={6}
+                  value={form.pincode}
+                  onChange={(e) => handleChange("pincode", e.target.value.replace(/\D/g, ""))}
+                  className="w-full h-12 border rounded-xl px-4"
+                  placeholder="243003"
+                />
+
+              </div>
+
+            </div>
 
           </div>
 

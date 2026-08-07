@@ -17,7 +17,11 @@ const OrderCard = ({ order }) => {
   return (
     <div
       onClick={() =>
-        navigate(`/order-details/${order.id}`)
+        navigate(`/order-details/${order.id}`,{
+          state:{
+            status:order.delivery_status
+          }
+        })
       }
       className="
         bg-white

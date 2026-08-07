@@ -6,37 +6,64 @@ import { toast } from "react-toastify";
 import BottomNav from "../../components/home/BottomNav/BottomNav";
 
 const OrderDetails = () => {
-    const [orderItems, setOrderItems] = useState([]);
-    const [loading, setLoading] = useState(true);
+
     const { id } = useParams();
     const location = useLocation();
-    const order_status = location.state?.status;
     const navigate = useNavigate();
 
+    const order_status = location.state?.status;
+
+    const [orderItems, setOrderItems] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    // Return Modal
+    const [showReturnModal, setShowReturnModal] = useState(false);
+    const [selectedItem, setSelectedItem] = useState(null);
+
+    const [reason, setReason] = useState("");
+    const [remarks, setRemarks] = useState("");
+
+    const returnReasons = [
+        "Damaged Product",
+        "Wrong Product",
+        "Defective Product",
+        "Quality Issue",
+        "Size Issue",
+        "Received Late",
+        "Changed My Mind",
+        "Other",
+    ];
+
     useEffect(() => {
-        const fetchOrderItems = async () => {
-            try {
-                const res = await api.get(`order-items/${id}`);
-                if (res.data.status) {
-                    setOrderItems([...res.data.data].reverse());
-                }
-            } catch (err) {
-                console.error("Error fetching order items:", err);
-            } finally {
-                setLoading(false);
-            }
-        };
         fetchOrderItems();
     }, [id]);
 
+    const fetchOrderItems = async () => {
+        try {
+
+            const res = await api.get(`order-items/${id}`);
+
+            if (res.data.status) {
+                setOrderItems([...res.data.data].reverse());
+            }
+
+        } catch (err) {
+            console.log(err);
+            toast.error("Unable to fetch order details.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const handleViewInvoice = () => {
         navigate(`/invoice/${id}`, {
-            state: { status: order_status }
+            state: { status: order_status },
         });
     };
+
     const handleTrackOrder = () => {
         navigate(`/track/${id}`, {
-            state: { status: order_status }
+            state: { status: order_status },
         });
     };
 
@@ -45,205 +72,704 @@ const OrderDetails = () => {
     };
 
     const handleCancelOrder = async (id) => {
+
         try {
-            const response = await api.post(`order/update-status/${id}`, { status: "cancelled" });
+
+            const response = await api.post(
+                `order/update-status/${id}`,
+                {
+                    status: "cancelled",
+                }
+            );
+
             if (response.data.status) {
+
                 toast.success("Order cancelled successfully!");
+
                 navigate("/order");
+
             } else {
+
                 toast.error("Failed to cancel order.");
+
             }
+
         } catch (error) {
-            console.log("Error cancelling order:", { id });
+
+            console.log(error);
+
             toast.error("Something went wrong while cancelling the order.");
+
         }
+
+    };
+
+    // ---------- Return Helpers ----------
+
+    const canReturn = (item) => {
+
+        if (order_status !== "delivered") return false;
+
+        if (item.return_status !== "not_requested") return false;
+
+        if (item.return_days <= 0) return false;
+
+        if (!item.return_expiry_date) return false;
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const expiry = new Date(item.return_expiry_date);
+        expiry.setHours(23, 59, 59, 999);
+
+        return today <= expiry;
+
+    };
+
+    const openReturnModal = (item) => {
+
+        setSelectedItem(item);
+
+        setReason("");
+
+        setRemarks("");
+
+        setShowReturnModal(true);
+
+    };
+
+    const closeReturnModal = () => {
+
+        setSelectedItem(null);
+
+        setReason("");
+
+        setRemarks("");
+
+        setShowReturnModal(false);
+
+    };
+
+    const submitReturnRequest = async () => {
+
+        if (!reason) {
+
+            toast.error("Please select a reason.");
+
+            return;
+
+        }
+
+        try {
+
+            const res = await api.post("/returns/request", {
+                order_item_id: selectedItem.id,
+                reason,
+                remarks,
+            });
+
+            if (res.data.status) {
+
+                toast.success(res.data.message);
+
+                setOrderItems((prev) =>
+                    prev.map((item) =>
+                        item.id === selectedItem.id
+                            ? {
+                                ...item,
+                                return_status: "requested",
+                            }
+                            : item
+                    )
+                );
+
+                closeReturnModal();
+
+            }
+
+        } catch (err) {
+
+            toast.error(
+                err.response?.data?.message ||
+                "Unable to submit return request."
+            );
+
+        }
+
+    };
+
+    const getReturnBadge = (item) => {
+
+        switch (item.return_status) {
+
+            case "requested":
+                return (
+                    <span className="px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 text-xs font-semibold">
+                        Return Requested
+                    </span>
+                );
+
+            case "approved":
+                return (
+                    <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-semibold">
+                        Return Approved
+                    </span>
+                );
+
+            case "rejected":
+                return (
+                    <span className="px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-semibold">
+                        Return Rejected
+                    </span>
+                );
+
+            case "picked_up":
+                return (
+                    <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold">
+                        Picked Up
+                    </span>
+                );
+
+            case "completed":
+                return (
+                    <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-semibold">
+                        Return Completed
+                    </span>
+                );
+
+            default:
+                return null;
+
+        }
+
     };
 
     return (
         <>
-            <div classname="pb-24">
-                <HeaderCopy />
-                {/* ---------- ORDER STATUS + PROGRESS ---------- */}
-                <div className="bg-white mt-6 p-6 rounded-xl shadow border border-gray-200 mx-4 sm:mx-6 md:mx-10">
-                    <h3 className="text-lg font-semibold text-gray-700 mb-4">Delivery Status</h3>
+            <div className="min-h-screen bg-gray-50 pb-28">
+                {/* Page Header */}
+                <div className="max-w-6xl mx-auto px-4 mt-6">
 
-                    {/* Status Steps */}
-                    <div className="relative w-full flex items-center justify-between">
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="text-sm text-gray-600 hover:text-black mb-3"
+                    >
+                        ← Back
+                    </button>
 
-                        {/* If Cancelled → Show only 2 steps */}
-                        {order_status === "cancelled" ? (
-                            <>
-                                {/* Step 1 — Ordered */}
-                                <div className="flex flex-col items-center w-1/2">
-                                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold bg-red-600">
-                                        1
-                                    </div>
-                                    <p className="mt-2 text-sm font-medium text-red-700">Ordered</p>
-                                </div>
+                    <div className="bg-white rounded-2xl shadow-sm border p-6">
 
-                                {/* Step 2 — Cancelled */}
-                                <div className="flex flex-col items-center w-1/2">
-                                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold bg-red-600">
-                                        2
-                                    </div>
-                                    <p className="mt-2 text-sm font-medium text-red-700">Cancelled</p>
-                                </div>
-                            </>
-                        ) : (
-                            /* Normal Flow: Ordered → Shipped → Delivered */
-                            ["ordered", "shipped", "delivered"].map((step, index) => {
-                                const currentIndex =
-                                    order_status === "pending"
-                                        ? 0
-                                        : order_status === "shipped"
-                                            ? 1
-                                            : order_status === "delivered"
-                                                ? 2
-                                                : 0;
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 
-                                const stepNames = {
-                                    ordered: "Ordered",
-                                    shipped: "Shipped",
-                                    delivered: "Delivered",
-                                };
+                            <div>
 
-                                return (
-                                    <div key={index} className="flex flex-col items-center w-1/3">
-                                        <div
-                                            className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold 
-                        ${index <= currentIndex ? "bg-green-600" : "bg-gray-300"}`}
-                                        >
-                                            {index + 1}
+                                <h2 className="text-2xl font-bold text-gray-800">
+                                    Order Details
+                                </h2>
+
+                                <p className="text-gray-500 mt-1">
+                                    Order ID #{id}
+                                </p>
+
+                            </div>
+
+                            <div>
+
+                                <span
+                                    className={`px-5 py-2 rounded-full text-sm font-semibold
+                                        ${order_status === "delivered"
+                                            ? "bg-green-100 text-green-700"
+                                            : order_status === "pending"
+                                                ? "bg-yellow-100 text-yellow-700"
+                                                : order_status === "shipped"
+                                                    ? "bg-blue-100 text-blue-700"
+                                                    : "bg-red-100 text-red-700"
+                                        }`
+                                    }
+                                >
+                                    {order_status?.toUpperCase()}
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                {/* Delivery Status */}
+
+                <div className="max-w-6xl mx-auto px-4 mt-6">
+
+                    <div className="bg-white rounded-2xl shadow-sm border p-6">
+
+                        <h3 className="text-lg font-semibold mb-8">
+                            Delivery Progress
+                        </h3>
+
+                        <div className="flex items-center justify-between relative">
+
+                            {order_status === "cancelled" ? (
+
+                                <>
+
+                                    <div className="flex flex-col items-center w-1/2">
+
+                                        <div className="w-10 h-10 rounded-full bg-red-600 text-white flex items-center justify-center font-bold">
+                                            ✓
                                         </div>
-                                        <p
-                                            className={`mt-2 text-sm font-medium 
-                        ${index <= currentIndex ? "text-green-700" : "text-gray-500"}`}
-                                        >
-                                            {stepNames[step]}
-                                        </p>
+
+                                        <span className="mt-2 text-red-600 font-medium">
+                                            Ordered
+                                        </span>
+
                                     </div>
-                                );
-                            })
-                        )}
-                    </div>
 
+                                    <div className="flex flex-col items-center w-1/2">
 
-                    {/* Progress Bar */}
-                    <div className="w-full mt-4 h-1 bg-gray-300 rounded-full relative">
-                        <div
-                            className={`absolute left-0 top-0 h-1 rounded-full transition-all duration-500 ${order_status === "cancelled" ? "bg-red-600" : "bg-green-600"}`}
-                            style={{
-                                width:
-                                    order_status === "pending"
-                                        ? "25%"
-                                        : order_status === "shipped"
-                                            ? "50%"
-                                            : "100%",
-                            }}
-                        ></div>
-                    </div>
-                </div>
+                                        <div className="w-10 h-10 rounded-full bg-red-600 text-white flex items-center justify-center font-bold">
+                                            ✕
+                                        </div>
 
-                {/* ---------- CANCEL ORDER BUTTON ---------- */}
-                {order_status === "pending" && (
-                    <div className="mt-6 text-center">
-                        <button
-                            onClick={() => handleCancelOrder(id)}
-                            className="px-5 py-2 bg-red-600 text-white text-sm font-semibold rounded-lg shadow hover:bg-red-700 transition"
-                        >
-                            Cancel Order
-                        </button>
-                    </div>
-                )}
+                                        <span className="mt-2 text-red-600 font-medium">
+                                            Cancelled
+                                        </span>
 
-                <div className="mt-4 text-center">
-                    <button
-                        onClick={handleViewInvoice}
-                        className="px-5 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg shadow hover:bg-green-700 transition"
-                    >
-                        View Invoice
-                    </button>
-                    
-                </div>
-                <div className="mt-4 text-center">
-                    <button
-                        onClick={handleTrackOrder}
-                        className="px-5 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg shadow hover:bg-green-700 transition"
-                    >
-                        Track Order
-                    </button>
-                    
-                </div>
-                
+                                    </div>
 
-                {/* ---------- ITEMS LIST ---------- */}
-                <div className="bg-white mt-6 p-6 rounded-xl shadow border border-gray-200 mx-4 sm:mx-6 md:mx-10">
-                    <h3 className="text-lg font-semibold text-gray-700 mb-5">Items in this Order</h3>
+                                </>
 
-                    {loading ? (
-                        <p className="text-gray-500">Loading...</p>
-                    ) : (
-                        orderItems.map((item) => (
+                            ) : (
+
+                                ["Ordered", "Shipped", "Delivered"].map(
+                                    (step, index) => {
+
+                                        const current =
+                                            order_status === "pending"
+                                                ? 0
+                                                : order_status === "shipped"
+                                                    ? 1
+                                                    : 2;
+
+                                        return (
+
+                                            <div
+                                                key={index}
+                                                className="flex flex-col items-center w-1/3"
+                                            >
+
+                                                <div
+                                                    className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-white
+                                            ${index <= current
+                                                            ? "bg-green-600"
+                                                            : "bg-gray-300"
+                                                        }`}
+                                                >
+                                                    {index + 1}
+                                                </div>
+
+                                                <span
+                                                    className={`mt-2 text-sm font-medium
+                                            ${index <= current
+                                                            ? "text-green-700"
+                                                            : "text-gray-500"
+                                                        }`}
+                                                >
+                                                    {step}
+                                                </span>
+
+                                            </div>
+
+                                        );
+
+                                    }
+                                )
+
+                            )}
+
+                        </div>
+
+                        <div className="mt-8 h-2 rounded-full bg-gray-200 overflow-hidden">
+
                             <div
-                                key={item.id}
-                                className="flex gap-3 w-full py-4 border-b last:border-b-0 cursor-pointer"
-                                onClick={() => handleProductDetails(item.product.id)}
+                                className={`h-full
+                        ${order_status === "cancelled"
+                                        ? "bg-red-600"
+                                        : "bg-green-600"
+                                    }`}
+                                style={{
+                                    width:
+                                        order_status === "pending"
+                                            ? "33%"
+                                            : order_status === "shipped"
+                                                ? "66%"
+                                                : "100%",
+                                }}
+                            />
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                {/* Action Buttons */}
+
+                <div className="max-w-6xl mx-auto px-4 mt-6">
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                        {order_status === "pending" && (
+
+                            <button
+                                onClick={() => handleCancelOrder(id)}
+                                className="bg-red-600 hover:bg-red-700 text-white rounded-xl py-3 font-semibold transition"
                             >
-                                {/* Product Image */}
-                                <img
-                                    src={`${process.env.REACT_APP_API_URL}/public/${item.product.image}`}
-                                    alt={item.product.name}
-                                    className="w-20 h-20 rounded-md object-cover border shrink-0"
+                                Cancel Order
+                            </button>
+
+                        )}
+
+                        <button
+                            onClick={handleViewInvoice}
+                            className="bg-black text-[#C79D17] rounded-xl py-3 font-semibold hover:opacity-90 transition"
+                        >
+                            View Invoice
+                        </button>
+
+                        <button
+                            onClick={handleTrackOrder}
+                            className="bg-[#C79D17] text-black rounded-xl py-3 font-semibold hover:opacity-90 transition"
+                        >
+                            Track Order
+                        </button>
+
+                    </div>
+
+                </div>
+
+                {/* Products */}
+
+                <div className="max-w-6xl mx-auto px-4 mt-6">
+
+                    <div className="bg-white rounded-2xl shadow-sm border p-6">
+
+                        <h3 className="text-xl font-bold mb-6">
+                            Ordered Products
+                        </h3>
+
+                        {loading ? (
+
+                            <div className="text-center py-10">
+                                Loading...
+                            </div>
+
+                        ) : (
+
+                            orderItems.map((item) => (
+                                <div
+                                    key={item.id}
+                                    className="border rounded-2xl p-5 mb-5 hover:shadow-md transition bg-white"
+                                >
+
+                                    <div className="flex flex-col md:flex-row gap-5">
+
+                                        {/* Product Image */}
+
+                                        <div className="w-full md:w-40 flex justify-center">
+
+                                            <img
+                                                src={`${process.env.REACT_APP_API_URL}/public/${item.product.image}`}
+                                                alt={item.product.name}
+                                                onClick={() => handleProductDetails(item.product.id)}
+                                                className="w-36 h-36 object-cover rounded-xl border cursor-pointer hover:scale-105 transition"
+                                            />
+
+                                        </div>
+
+                                        {/* Product Details */}
+
+                                        <div className="flex-1">
+
+                                            <div className="flex flex-col lg:flex-row lg:justify-between gap-3">
+
+                                                <div>
+
+                                                    <h3
+                                                        onClick={() => handleProductDetails(item.product.id)}
+                                                        className="text-xl font-bold text-gray-800 cursor-pointer hover:text-[#C79D17]"
+                                                    >
+                                                        {item.product.name}
+                                                    </h3>
+
+                                                    <div
+                                                        className="text-sm text-gray-500 mt-2 line-clamp-2"
+                                                        dangerouslySetInnerHTML={{
+                                                            __html: item.product.description,
+                                                        }}
+                                                    />
+
+                                                </div>
+
+                                                <div>
+
+                                                    <span
+                                                        className={`px-4 py-2 rounded-full text-sm font-semibold
+                        ${order_status === "delivered"
+                                                                ? "bg-green-100 text-green-700"
+                                                                : order_status === "pending"
+                                                                    ? "bg-yellow-100 text-yellow-700"
+                                                                    : order_status === "shipped"
+                                                                        ? "bg-blue-100 text-blue-700"
+                                                                        : "bg-red-100 text-red-700"
+                                                            }`}
+                                                    >
+                                                        {order_status}
+                                                    </span>
+
+                                                </div>
+
+                                            </div>
+
+                                            {/* Details */}
+
+                                            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+
+                                                <div>
+
+                                                    <p className="text-gray-500 text-sm">
+                                                        Quantity
+                                                    </p>
+
+                                                    <p className="font-semibold">
+                                                        {item.quantity}
+                                                    </p>
+
+                                                </div>
+
+                                                <div>
+
+                                                    <p className="text-gray-500 text-sm">
+                                                        Size
+                                                    </p>
+
+                                                    <p className="font-semibold uppercase">
+                                                        {item.size || "-"}
+                                                    </p>
+
+                                                </div>
+
+                                                <div>
+
+                                                    <p className="text-gray-500 text-sm">
+                                                        GST
+                                                    </p>
+
+                                                    <p className="font-semibold">
+                                                        {item.gst}%
+                                                    </p>
+
+                                                </div>
+
+                                                <div>
+
+                                                    <p className="text-gray-500 text-sm">
+                                                        Price
+                                                    </p>
+
+                                                    <p className="font-bold text-green-600 text-lg">
+                                                        ₹{item.price}
+                                                    </p>
+
+                                                </div>
+
+                                            </div>
+
+                                            {/* Return Status */}
+
+                                            {item.return_status !== "not_requested" && (
+
+                                                <div className="mt-5">
+
+                                                    {getReturnBadge(item)}
+
+                                                </div>
+
+                                            )}
+
+                                            {/* Return Expiry */}
+
+                                            {item.return_days > 0 && item.return_status === "not_requested" && (
+
+                                                <div className="mt-4">
+
+                                                    <p className="text-sm text-gray-500">
+
+                                                        Return available till{" "}
+
+                                                        <span className="font-semibold text-black">
+
+                                                            {new Date(
+                                                                item.return_expiry_date
+                                                            ).toLocaleDateString()}
+
+                                                        </span>
+
+                                                    </p>
+
+                                                </div>
+
+                                            )}
+
+                                            {/* Return Button */}
+
+                                            {canReturn(item) && (
+
+                                                <div className="mt-6">
+
+                                                    <button
+                                                        onClick={() => openReturnModal(item)}
+                                                        className="px-6 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-semibold transition"
+                                                    >
+                                                        Return Product
+                                                    </button>
+
+                                                </div>
+
+                                            )}
+
+                                            {/* Window Closed */}
+
+                                            {!canReturn(item) &&
+                                                item.return_status === "not_requested" &&
+                                                item.return_days > 0 && (
+
+                                                    <div className="mt-6">
+
+                                                        <span className="inline-block bg-gray-100 text-gray-600 px-4 py-2 rounded-full text-sm">
+
+                                                            Return Window Closed
+
+                                                        </span>
+
+                                                    </div>
+
+                                                )}
+
+                                            {/* Not Returnable */}
+
+                                            {item.return_days === 0 && (
+
+                                                <div className="mt-6">
+
+                                                    <span className="inline-block bg-red-50 text-red-600 px-4 py-2 rounded-full text-sm">
+
+                                                        Non Returnable Product
+
+                                                    </span>
+
+                                                </div>
+
+                                            )}
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            ))
+
+                        )}
+
+                    </div>
+
+                </div>
+
+                {/* Return Modal */}
+
+                {showReturnModal && (
+
+                    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-5">
+
+                        <div className="bg-white rounded-2xl w-full max-w-lg p-6">
+
+                            <h2 className="text-2xl font-bold mb-6">
+                                Return Product
+                            </h2>
+
+                            <div className="mb-4">
+
+                                <label className="font-semibold">
+                                    Reason
+                                </label>
+
+                                <select
+                                    value={reason}
+                                    onChange={(e) => setReason(e.target.value)}
+                                    className="mt-2 w-full border rounded-xl p-3"
+                                >
+
+                                    <option value="">
+                                        Select Reason
+                                    </option>
+
+                                    {returnReasons.map((r) => (
+
+                                        <option
+                                            key={r}
+                                            value={r}
+                                        >
+                                            {r}
+                                        </option>
+
+                                    ))}
+
+                                </select>
+
+                            </div>
+
+                            <div>
+
+                                <label className="font-semibold">
+                                    Remarks
+                                </label>
+
+                                <textarea
+                                    rows="4"
+                                    value={remarks}
+                                    onChange={(e) => setRemarks(e.target.value)}
+                                    placeholder="Write additional details..."
+                                    className="mt-2 w-full border rounded-xl p-3"
                                 />
 
-                                {/* Product Info */}
-                                <div className="flex flex-col w-full">
-
-                                    {/* Name + Badge */}
-                                    <div className="flex justify-between items-start w-full">
-                                        <p className="text-base font-semibold text-gray-800 break-words">
-                                            {item.product.name}
-                                        </p>
-
-                                        <span
-                                            className={`px-3 py-1 rounded-full text-xs font-medium shrink-0
-                                        ${order_status === "cancelled"
-                                                    ? "bg-red-100 text-red-600"
-                                                    : order_status === "shipped"
-                                                        ? "bg-yellow-100 text-yellow-600"
-                                                        : order_status === "delivered"
-                                                            ? "bg-green-100 text-green-600"
-                                                            : "bg-gray-100 text-gray-600"
-                                                }`}
-                                        >
-                                            {order_status}
-                                        </span>
-                                    </div>
-
-                                    {/* Description */}
-                                    <p className="text-gray-600 text-sm break-words whitespace-normal mt-1">
-                                        {item.product.description}
-                                    </p>
-
-                                    {/* Qty + Price */}
-                                    <div className="flex justify-between text-sm mt-2">
-                                        <p className="text-gray-700">
-                                            Qty: <span className="font-semibold">{item.quantity}</span>
-                                        </p>
-                                        <p className="text-gray-700">
-                                            Price:{" "}
-                                            <span className="font-semibold text-green-600">
-                                                ₹{item.price}
-                                            </span>
-                                        </p>
-                                    </div>
-                                </div>
                             </div>
-                        ))
-                    )}
-                </div>
+
+                            <div className="flex justify-end gap-3 mt-6">
+
+                                <button
+                                    onClick={closeReturnModal}
+                                    className="px-5 py-2 border rounded-xl"
+                                >
+                                    Cancel
+                                </button>
+
+                                <button
+                                    onClick={submitReturnRequest}
+                                    className="px-6 py-2 bg-black text-[#C79D17] rounded-xl"
+                                >
+                                    Submit Request
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                )}
             </div>
-            <BottomNav />
+
         </>
     );
 

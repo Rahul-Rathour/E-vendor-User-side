@@ -123,11 +123,11 @@ const router = createBrowserRouter(
         <Route path="/new-arrivals" element={<NewArrivals />} />
         <Route path="/login" element={<Login />}></Route>
         <Route path="/signup" element={<SignUp />}></Route>
-      <Route path="/order" element={<MyOrders />} />
+        <Route path="/order" element={<MyOrders />} />
+        <Route path="/mobile-account" element={<MobileAccount />} />
+        <Route path="/order-details/:id" element={<OrderDetails />} />
       </Route>
       <Route path="/signin" element={<SignIn />}></Route>
-      <Route path="/order-details/:id" element={<OrderDetails />} />
-      <Route path="/mobile-account" element={<MobileAccount />} />
       <Route path="/review" element={<Review />} />
       <Route path="/logout" element={<Logout />} />
       <Route path="/orderSuccess" element={<OrderSuccess />} />

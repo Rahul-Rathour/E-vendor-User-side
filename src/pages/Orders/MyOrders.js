@@ -191,12 +191,12 @@ const MyOrders = () => {
                             <div
                                 key={item}
                                 className="
-                  h-52
-                  rounded-2xl
-                  bg-white
-                  border
-                  animate-pulse
-                "
+                                  h-52
+                                  rounded-2xl
+                                  bg-white
+                                  border
+                                  animate-pulse
+                                "
                             />
 
                         ))}

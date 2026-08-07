@@ -9,10 +9,12 @@ import ShippingAddressCard from "./ShippingAddressCard";
 import PaymentMethodCard from "./PaymentMethodCard";
 import CheckoutFeatures from "./CheckoutFeatures";
 import CheckoutOrderSummary from "./CheckoutOrderSummary";
+import { useCart } from "../../context/CartContext";
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const {checkout} = useCart();
 
   const {
     cart = [],
@@ -61,152 +63,90 @@ const CheckoutPage = () => {
   // PLACE ORDER
   // ==========================================
 
-  const handleConfirmCheckout = async () => {
-    if (!shippingAddress.trim()) {
-      toast.error("Please enter your shipping address");
-      return;
-    }
+const handleConfirmCheckout = async () => {
+  if (!shippingAddress.trim()) {
+    toast.error("Please enter your shipping address");
+    return;
+  }
 
-    if (!user) {
-      toast.error("Please login first");
-      navigate("/login");
-      return;
-    }
+  if (!user) {
+    toast.error("Please login first");
+    navigate("/login");
+    return;
+  }
 
-    try {
-      // ================= COD =================
+  // Generate Order Number
+  const order_number =
+    "ORD-" +
+    Math.random().toString(36).substring(2, 10).toUpperCase();
 
-      if (paymentMethod === "COD") {
-        const payload = {
-          user_id: user.id,
-          shipping_address: shippingAddress,
-          payment_method: "COD",
-          gst_number: usergst,
-          coupon_id: selectedCoupon?.id || null,
-          discount_amount: Number(discountAmount || 0),
-          total_amount: grandTotal,
-        };
+  // Coupon
+  const couponCode =
+    selectedCoupon?.code || "N/A";
 
-        const res = await api.post("/checkout", payload);
+  // Discount
+  const discount =
+    Number(discountAmount || 0);
 
-        if (res.data.status) {
-          toast.success("Order placed successfully");
+  // ===================================================
+  // Create one address string from all address fields
+  // ===================================================
 
-          // If you already have this function
-          // keep it, otherwise remove this line
-          // if (typeof sendOrderConfirmationEmail === "function") {
-          //   await sendOrderConfirmationEmail();
-          // }
+  // If ShippingAddressCard already returns a formatted string,
+  // then shippingAddress is already correct.
 
-          navigate("/order-success", {
-            state: {
-              order: res.data.data,
-            },
-          });
-        } else {
-          toast.error(res.data.message || "Checkout failed");
-        }
+  const finalAddress = shippingAddress;
 
-        return;
-      }
+  // ===================================================
+  // CASH ON DELIVERY
+  // ===================================================
 
-      // ================= ONLINE PAYMENT =================
+  if (paymentMethod === "COD") {
 
-      const orderRes = await api.post("/razorpay/order", {
-        amount: grandTotal,
+    const success = await checkout(
+      finalAddress,
+      "COD",
+      order_number,
+      grandTotal,
+      discount,
+      couponCode
+    );
+
+    if (success) {
+
+      navigate("/orderSuccess", {
+        state: {
+          totalAmt: grandTotal,
+          discountAmount: discount,
+          shippingAddress: finalAddress,
+          cart,
+          order_number,
+          usergst,
+        },
       });
 
-      const options = {
-        key: process.env.REACT_APP_RAZORPAY_KEY,
-
-        amount: orderRes.data.amount,
-
-        currency: orderRes.data.currency,
-
-        name: "Your Store",
-
-        description: "Order Payment",
-
-        order_id: orderRes.data.id,
-
-        handler: async function (response) {
-          try {
-            const verify = await api.post("/checkout", {
-              user_id: user.id,
-              shipping_address: shippingAddress,
-              payment_method: "Online",
-              gst_number: usergst,
-
-              razorpay_order_id:
-                response.razorpay_order_id,
-
-              razorpay_payment_id:
-                response.razorpay_payment_id,
-
-              razorpay_signature:
-                response.razorpay_signature,
-
-              coupon_id: selectedCoupon?.id || null,
-
-              discount_amount: Number(
-                discountAmount || 0
-              ),
-
-              total_amount: grandTotal,
-            });
-
-            if (verify.data.status) {
-              toast.success("Payment Successful");
-
-              // if (
-              //   typeof sendOrderConfirmationEmail ===
-              //   "function"
-              // ) {
-              //   await sendOrderConfirmationEmail();
-              // }
-
-              navigate("/order-success", {
-                state: {
-                  order: verify.data.data,
-                },
-              });
-            } else {
-              toast.error(
-                verify.data.message ||
-                "Payment verification failed"
-              );
-            }
-          } catch (err) {
-            console.log(err);
-
-            toast.error(
-              "Payment verification failed."
-            );
-          }
-        },
-
-        prefill: {
-          name: user?.name,
-
-          email: user?.email,
-
-          contact: user?.phone,
-        },
-
-        theme: {
-          color: "#D4AF37",
-        },
-      };
-
-      const razorpay = new window.Razorpay(options);
-
-      razorpay.open();
-    } catch (err) {
-      console.log(err);
-
-      toast.error("Checkout failed");
     }
-  };
+
+    return;
+  }
+
+  // ===================================================
+  // ONLINE PAYMENT
+  // ===================================================
+
+  navigate("/razorpay", {
+    state: {
+      finalTotal: grandTotal,
+      discountAmount: discount,
+      cart,
+      shippingAddress: finalAddress,
+      paymentMethod: "Online",
+      order_number,
+      usergst,
+      selectedCoupon,
+    },
+  });
+};
   return (
     <div className="bg-[#FAFAFA] min-h-screen">
 
@@ -280,7 +220,7 @@ const CheckoutPage = () => {
 
           <div className="xl:col-span-4">
 
-            <div className="sticky top-8">
+            <div className="sticky top-8"> 
 
               <CheckoutOrderSummary
                 cart={cart}
