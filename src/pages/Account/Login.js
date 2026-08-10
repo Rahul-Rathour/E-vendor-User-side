@@ -194,25 +194,25 @@ const Login = () => {
 
                 {/* Google */}
 
-                <button
+                {/* <button
                   type="button"
                   className="w-full h-14 rounded-xl border border-gray-300 hover:border-[#C79D17] flex items-center justify-center gap-3 transition"
                 >
                   <FcGoogle size={24} />
 
                   Continue with Google
-                </button>
+                </button> */}
 
                 {/* Phone */}
 
-                <button
+                {/* <button
                   type="button"
                   className="w-full h-14 rounded-xl border border-gray-300 hover:border-[#C79D17] flex items-center justify-center gap-3 transition"
                 >
                   <FaPhoneAlt />
 
                   Continue with Phone (OTP)
-                </button>
+                </button> */}
 
                 {/* Signup */}
 
