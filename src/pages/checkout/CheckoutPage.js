@@ -14,7 +14,7 @@ import { useCart } from "../../context/CartContext";
 const CheckoutPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const {checkout} = useCart();
+  const { checkout } = useCart();
 
   const {
     cart = [],
@@ -26,9 +26,23 @@ const CheckoutPage = () => {
 
   const [shippingAddress, setShippingAddress] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("COD");
-  const [usergst, setUsergst] = useState("");
-
   const user = JSON.parse(localStorage.getItem("user"));
+  const [phone, setPhone] = useState(user?.phone || "");
+  const [shippingDetails, setShippingDetails] = useState({
+    house: "",
+    street: "",
+    landmark: "",
+    city: "",
+    state: "",
+    pincode: "",
+  });
+
+  const [usergst, setUsergst] = useState(
+    user?.identity_type === "gst"
+      ? user?.identity_number || ""
+      : ""
+  );
+
 
   useEffect(() => {
     if (!user) {
@@ -38,7 +52,7 @@ const CheckoutPage = () => {
   }, [navigate, user]);
 
   const calculateGSTAmount = (item) => {
-    const price = item.product.price * item.quantity;
+    const price = item.product.wholesale_price * item.quantity;
     return (price * item.product.gst) / 100;
   };
 
@@ -48,7 +62,7 @@ const CheckoutPage = () => {
   );
 
   const subtotal = cart.reduce(
-    (sum, item) => sum + item.product.price * item.quantity,
+    (sum, item) => sum + item.product.wholesale_price * item.quantity,
     0
   );
 
@@ -63,90 +77,95 @@ const CheckoutPage = () => {
   // PLACE ORDER
   // ==========================================
 
-const handleConfirmCheckout = async () => {
-  if (!shippingAddress.trim()) {
-    toast.error("Please enter your shipping address");
-    return;
-  }
-
-  if (!user) {
-    toast.error("Please login first");
-    navigate("/login");
-    return;
-  }
-
-  // Generate Order Number
-  const order_number =
-    "ORD-" +
-    Math.random().toString(36).substring(2, 10).toUpperCase();
-
-  // Coupon
-  const couponCode =
-    selectedCoupon?.code || "N/A";
-
-  // Discount
-  const discount =
-    Number(discountAmount || 0);
-
-  // ===================================================
-  // Create one address string from all address fields
-  // ===================================================
-
-  // If ShippingAddressCard already returns a formatted string,
-  // then shippingAddress is already correct.
-
-  const finalAddress = shippingAddress;
-
-  // ===================================================
-  // CASH ON DELIVERY
-  // ===================================================
-
-  if (paymentMethod === "COD") {
-
-    const success = await checkout(
-      finalAddress,
-      "COD",
-      order_number,
-      grandTotal,
-      discount,
-      couponCode
-    );
-
-    if (success) {
-
-      navigate("/orderSuccess", {
-        state: {
-          totalAmt: grandTotal,
-          discountAmount: discount,
-          shippingAddress: finalAddress,
-          cart,
-          order_number,
-          usergst,
-        },
-      });
-
+  const handleConfirmCheckout = async () => {
+    if (!shippingAddress.trim()) {
+      toast.error("Please enter your shipping address");
+      return;
     }
 
-    return;
-  }
+    if (!user) {
+      toast.error("Please login first");
+      navigate("/login");
+      return;
+    }
 
-  // ===================================================
-  // ONLINE PAYMENT
-  // ===================================================
+    // Generate Order Number
+    const order_number =
+      "ORD-" +
+      Math.random().toString(36).substring(2, 10).toUpperCase();
 
-  navigate("/razorpay", {
-    state: {
-      finalTotal: grandTotal,
-      discountAmount: discount,
-      cart,
-      shippingAddress: finalAddress,
-      paymentMethod: "Online",
-      order_number,
-      usergst,
-      selectedCoupon,
-    },
-  });
-};
+    // Coupon
+    const couponCode =
+      selectedCoupon?.code || "N/A";
+
+    // Discount
+    const discount =
+      Number(discountAmount || 0);
+
+    // ===================================================
+    // Create one address string from all address fields
+    // ===================================================
+
+    // If ShippingAddressCard already returns a formatted string,
+    // then shippingAddress is already correct.
+
+    const finalAddress = shippingAddress;
+
+    // ===================================================
+    // CASH ON DELIVERY
+    // ===================================================
+
+    if (paymentMethod === "COD") {
+
+      const success = await checkout(
+        finalAddress,
+        "COD",
+        order_number,
+        grandTotal,
+        discount,
+        couponCode,
+        usergst,
+        phone,
+        shippingDetails
+      );
+
+      if (success) {
+
+        navigate("/orderSuccess", {
+          state: {
+            totalAmt: grandTotal,
+            discountAmount: discount,
+            shippingAddress: finalAddress,
+            cart,
+            order_number,
+            usergst,
+          },
+        });
+
+      }
+
+      return;
+    }
+
+    // ===================================================
+    // ONLINE PAYMENT
+    // ===================================================
+
+    navigate("/razorpay", {
+      state: {
+        totalAmt: grandTotal,
+        finalTotal: grandTotal,
+        discountAmount: discount,
+        shippingCharge,
+        cart,
+        shippingAddress: finalAddress,
+        paymentMethod: "Online",
+        order_number,
+        usergst,
+        selectedCoupon,
+      },
+    });
+  };
   return (
     <div className="bg-[#FAFAFA] min-h-screen">
 
@@ -199,6 +218,10 @@ const handleConfirmCheckout = async () => {
               setShippingAddress={setShippingAddress}
               usergst={usergst}
               setUsergst={setUsergst}
+              user={user}
+              phone={phone}
+              setPhone={setPhone}
+              setShippingDetails={setShippingDetails}
             />
 
             {/* Payment */}
@@ -220,7 +243,7 @@ const handleConfirmCheckout = async () => {
 
           <div className="xl:col-span-4">
 
-            <div className="sticky top-8"> 
+            <div className="sticky top-8">
 
               <CheckoutOrderSummary
                 cart={cart}

@@ -2,8 +2,19 @@ import React from "react";
 import { FiArrowRight, FiBox, FiRefreshCw } from "react-icons/fi";
 import { GiClothes } from "react-icons/gi";
 import { MdOutlineLocalShipping } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
 
 const HeroLeft = () => {
+
+  const navigate = useNavigate();
+
+  const handleNavigate = ()=>{
+    window.location.href = "https://bulk.blackhewzen.com/";
+  }
+
+  const handleShop = ()=>{
+    navigate('/shop');
+  }
   return (
     <div className="flex flex-col justify-center py-12 lg:py-0">
 
@@ -37,6 +48,7 @@ const HeroLeft = () => {
         {/* Shop */}
 
         <button
+        onClick={handleShop}
           className="
             bg-[#D4AF37]
             hover:bg-[#BF9B2F]
@@ -59,6 +71,7 @@ const HeroLeft = () => {
         {/* Bulk */}
 
         <button
+        onClick={handleNavigate}
           className="
             border
             border-[#D4AF37]

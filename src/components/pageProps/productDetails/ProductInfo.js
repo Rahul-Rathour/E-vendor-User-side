@@ -72,12 +72,13 @@ const ProductInfo = ({
                 : "border-gray-400 hover:border-black"
                 }`}
             >
-              {size.size} ({size.qty})
+              {size.size} 
+              {/* ({size.qty}) */}
             </button>
-          ))}
+          ))} 
         </div>
         {availableSizes.length === 0 && (
-          <p className="text-red-500 text-sm">No sizes available for this color</p>
+          <p className="text-red-500 text-sm">No sizes available for this color</p> 
         )}
       </div>
 

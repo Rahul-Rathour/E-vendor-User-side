@@ -73,7 +73,7 @@ const Navbar = () => {
                     {/* Dealer Login Button */}
 
                     <div className="flex items-center">
-                        <NavLink
+                        {/* <NavLink
                             to="/bulk-order"
                             className={({ isActive }) =>
                                 `mr-4 text-sm font-medium tracking-wide transition-all duration-200 ${isActive
@@ -83,14 +83,14 @@ const Navbar = () => {
                             }
                         >
                             Bulk Order
-                        </NavLink>
+                        </NavLink> */}
 
-                        <NavLink
-                            to="/dealer-login"
+                        <a
+                            href="https://bulk.blackhewzen.com/"
                             className="border border-[#D4AF37] text-[#D4AF37] px-5 py-2 rounded-md text-sm font-semibold hover:bg-[#D4AF37] hover:text-black transition-all duration-300"
                         >
-                            Dealer Login
-                        </NavLink>
+                           Bulk Order
+                        </a>
 
                     </div>
 

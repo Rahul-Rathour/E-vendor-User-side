@@ -10,14 +10,18 @@ const ShippingAddressCard = ({
   setShippingAddress,
   usergst,
   setUsergst,
+  user,
+  phone,
+  setPhone,
+  setShippingDetails,
 }) => {
   const [form, setForm] = useState({
     house: "",
-    street: "",
+    street: user?.shop_address || "",
     landmark: "",
-    city: "",
-    state: "",
-    pincode: "",
+    city: user?.city || "",
+    state: user?.state || "",
+    pincode: user?.pincode || "",
   });
 
   const states = [
@@ -75,7 +79,16 @@ const ShippingAddressCard = ({
       .join(", ");
 
     setShippingAddress(address);
-  }, [form, setShippingAddress]);
+
+    setShippingDetails({
+      house: form.house,
+      street: form.street,
+      landmark: form.landmark,
+      city: form.city,
+      state: form.state,
+      pincode: form.pincode,
+    });
+  }, [form, setShippingAddress, setShippingDetails]);
   return (
     <div
       className="
@@ -329,6 +342,25 @@ const ShippingAddressCard = ({
 
           </div>
 
+        </div>
+
+        {/* Phone */}
+
+        <div>
+          <label className="block mb-2 font-medium">
+            Phone Number *
+          </label>
+
+          <input
+            type="text"
+            maxLength={10}
+            value={phone}
+            onChange={(e) =>
+              setPhone(e.target.value.replace(/\D/g, ""))
+            }
+            className="w-full h-12 border rounded-xl px-4"
+            placeholder="9876543210"
+          />
         </div>
 
         {/* Info Box */}
