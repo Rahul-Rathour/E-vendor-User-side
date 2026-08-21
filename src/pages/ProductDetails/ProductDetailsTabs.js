@@ -7,32 +7,61 @@ const ProductDetailsTabs = ({ productInfo }) => {
   const [open, setOpen] = useState(true);
 
   // Convert HTML into Key : Value pairs
-  const parseSpecification = (html) => {
-    if (!html) return [];
+  const parseSpecification = (content) => {
+    if (!content) return [];
 
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, "text/html");
+    // If content contains HTML tags
+    if (/<[a-z][\s\S]*>/i.test(content)) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(content, "text/html");
 
-    const rows = [];
+      const rows = [];
 
-    doc.querySelectorAll("p").forEach((p) => {
-      const strong = p.querySelector("strong");
+      // Handle <p>Key: Value</p>
+      doc.querySelectorAll("p").forEach((p) => {
+        const text = p.textContent.trim();
 
-      if (strong) {
-        let key = strong.textContent.replace(":", "").trim();
+        if (!text) return;
 
-        strong.remove();
+        const colonIndex = text.indexOf(":");
 
-        let value = p.textContent.trim();
+        if (colonIndex !== -1) {
+          const key = text.substring(0, colonIndex).trim();
+          const value = text.substring(colonIndex + 1).trim();
 
-        rows.push({
-          key,
-          value,
-        });
-      }
-    });
+          if (key && value) {
+            rows.push({
+              key,
+              value,
+            });
+          }
+        }
+      });
 
-    return rows;
+      return rows;
+    }
+
+    // Handle plain text
+    return content
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .map((line) => {
+        const colonIndex = line.indexOf(":");
+
+        if (colonIndex === -1) {
+          return {
+            key: "",
+            value: line,
+          };
+        }
+
+        return {
+          key: line.substring(0, colonIndex).trim(),
+          value: line.substring(colonIndex + 1).trim(),
+        };
+      })
+      .filter((item) => item.key && item.value);
   };
 
   const specifications = useMemo(
@@ -71,22 +100,20 @@ const ProductDetailsTabs = ({ productInfo }) => {
 
             <button
               onClick={() => setActiveTab("specification")}
-              className={`px-5 py-2 rounded-lg border transition-all font-medium ${
-                activeTab === "specification"
+              className={`px-5 py-2 rounded-lg border transition-all font-medium ${activeTab === "specification"
                   ? "bg-black text-white border-black"
                   : "bg-white border-gray-300 hover:border-black"
-              }`}
+                }`}
             >
               Specifications
             </button>
 
             <button
               onClick={() => setActiveTab("manufacturer")}
-              className={`px-5 py-2 rounded-lg border transition-all font-medium ${
-                activeTab === "manufacturer"
+              className={`px-5 py-2 rounded-lg border transition-all font-medium ${activeTab === "manufacturer"
                   ? "bg-black text-white border-black"
                   : "bg-white border-gray-300 hover:border-black"
-              }`}
+                }`}
             >
               Manufacturer Info
             </button>
@@ -94,11 +121,10 @@ const ProductDetailsTabs = ({ productInfo }) => {
             {productInfo.description && (
               <button
                 onClick={() => setActiveTab("description")}
-                className={`px-5 py-2 rounded-lg border transition-all font-medium ${
-                  activeTab === "description"
+                className={`px-5 py-2 rounded-lg border transition-all font-medium ${activeTab === "description"
                     ? "bg-black text-white border-black"
                     : "bg-white border-gray-300 hover:border-black"
-                }`}
+                  }`}
               >
                 Description
               </button>

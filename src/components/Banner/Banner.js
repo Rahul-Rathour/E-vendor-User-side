@@ -5,7 +5,7 @@ const Banner = () => {
     return (
         <>
             <HeroSection />
-            <FloatingInfoBar />
+            {/* <FloatingInfoBar /> */}
         </>
     );
 };

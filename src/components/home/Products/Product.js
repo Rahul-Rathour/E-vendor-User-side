@@ -194,7 +194,7 @@ const Product = (props) => {
               hover:bg-[#D4AF37]
               hover:text-black
               text-white
-              px-4
+              px-2
               py-2
               rounded-md
               text-sm

@@ -119,9 +119,9 @@ const MobileHeader = ({ onMenuClick }) => {
                     </button>
 
                     <button
-                        onClick={() => navigate('/bulk-order')}
+                        onClick={() => window.location.href="https://bulk.blackhewzen.com/"}
                         className="bg-[#D4AF37] rounded-lg py-3 text-black text-sm font-semibold hover:bg-[#c79d17] transition-all duration-200"
-                    >
+                    > 
                         Bulk
                     </button>
 

@@ -82,7 +82,7 @@ const Navbar = () => {
                                 }`
                             }
                         >
-                            Bulk Order
+                            Bulk Order 
                         </NavLink> */}
 
                         <a

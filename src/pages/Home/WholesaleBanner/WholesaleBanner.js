@@ -50,27 +50,27 @@ const WholesaleBanner = () => {
 
             <div className="px-10 flex justify-center">
 
-              <Link
-                to="/dealer"
+              <a
+                href="https://bulk.blackhewzen.com"
                 className="
-                  inline-flex
-                  items-center
-                  gap-3
-                  bg-[#D4AF37]
-                  text-black
-                  font-semibold
-                  px-8
-                  py-4
-                  rounded-md
-                  hover:bg-white
-                  transition-all
-                "
+      inline-flex
+      items-center
+      gap-3
+      bg-[#D4AF37]
+      text-black
+      font-semibold
+      px-8
+      py-4
+      rounded-md
+      hover:bg-white
+      transition-all
+    "
               >
                 BECOME A DEALER
 
                 <FiArrowRight />
 
-              </Link>
+              </a>
 
             </div>
 
