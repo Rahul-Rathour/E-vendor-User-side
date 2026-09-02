@@ -56,7 +56,7 @@ const FooterBrand = () => {
       <div className="flex items-center gap-3 mt-8">
 
         <a
-          href="#"
+          href="https://www.facebook.com/share/1B7YSCxRAA/?mibextid=wwXIfr"
           className="
             w-10
             h-10
@@ -76,7 +76,7 @@ const FooterBrand = () => {
         </a>
 
         <a
-          href="#"
+          href="https://www.instagram.com/black_hewzen_2021?igsh=MXQ5OGJoYndwbWh0MQ%3D%3D&utm_source=qr"
           className="
             w-10
             h-10
