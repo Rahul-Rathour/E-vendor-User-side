@@ -22,7 +22,9 @@ const RazorpayPayment = () => {
     cart,
     order_number,
     usergst,
-    selectedCoupon,
+    couponCode,
+    phone,
+    shippingDetails,
   } = state || {};
 
 
@@ -33,9 +35,7 @@ const RazorpayPayment = () => {
       return;
     }
 
-    /*
-     * Prevent React StrictMode from opening Razorpay twice
-     */
+    // Prevent React StrictMode from opening Razorpay twice
     if (paymentStarted.current) {
       return;
     }
@@ -51,9 +51,6 @@ const RazorpayPayment = () => {
 
     return new Promise((resolve) => {
 
-      /*
-       * Already loaded
-       */
       if (window.Razorpay) {
         resolve(true);
         return;
@@ -61,7 +58,8 @@ const RazorpayPayment = () => {
 
       const script = document.createElement("script");
 
-      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.src =
+        "https://checkout.razorpay.com/v1/checkout.js";
 
       script.onload = () => {
         resolve(true);
@@ -81,13 +79,12 @@ const RazorpayPayment = () => {
 
     try {
 
-      /*
-       * ============================
-       * LOAD RAZORPAY
-       * ============================
-       */
+      // ============================
+      // LOAD RAZORPAY
+      // ============================
 
-      const razorpayLoaded = await loadRazorpayScript();
+      const razorpayLoaded =
+        await loadRazorpayScript();
 
       if (!razorpayLoaded) {
 
@@ -101,11 +98,9 @@ const RazorpayPayment = () => {
       }
 
 
-      /*
-       * ============================
-       * CREATE RAZORPAY ORDER
-       * ============================
-       */
+      // ============================
+      // CREATE RAZORPAY ORDER
+      // ============================
 
       const response = await api.post(
         "razorpay/create-order",
@@ -132,11 +127,9 @@ const RazorpayPayment = () => {
       const razorpayData = response.data.data;
 
 
-      /*
-       * ============================
-       * RAZORPAY OPTIONS
-       * ============================
-       */
+      // ============================
+      // RAZORPAY OPTIONS
+      // ============================
 
       const options = {
 
@@ -150,38 +143,36 @@ const RazorpayPayment = () => {
 
         description: `Order #${order_number}`,
 
-        order_id: razorpayData.razorpay_order_id,
+        order_id:
+          razorpayData.razorpay_order_id,
 
 
-        /*
-         * ============================
-         * PAYMENT SUCCESS
-         * ============================
-         */
+        // ============================
+        // PAYMENT SUCCESS
+        // ============================
 
         handler: async function (paymentResponse) {
 
           try {
 
-            /*
-             * ============================
-             * VERIFY PAYMENT
-             * ============================
-             */
+            // ============================
+            // VERIFY PAYMENT
+            // ============================
 
-            const verifyResponse = await api.post(
-              "razorpay/verify-payment",
-              {
-                razorpay_order_id:
-                  paymentResponse.razorpay_order_id,
+            const verifyResponse =
+              await api.post(
+                "razorpay/verify-payment",
+                {
+                  razorpay_order_id:
+                    paymentResponse.razorpay_order_id,
 
-                razorpay_payment_id:
-                  paymentResponse.razorpay_payment_id,
+                  razorpay_payment_id:
+                    paymentResponse.razorpay_payment_id,
 
-                razorpay_signature:
-                  paymentResponse.razorpay_signature,
-              }
-            );
+                  razorpay_signature:
+                    paymentResponse.razorpay_signature,
+                }
+              );
 
 
             if (!verifyResponse.data.status) {
@@ -197,34 +188,42 @@ const RazorpayPayment = () => {
             }
 
 
-            /*
-             * ============================
-             * PAYMENT VERIFIED
-             * ============================
-             *
-             * Now create the actual order
-             * using your existing checkout()
-             *
-             * Same flow as COD
-             */
+            // ============================
+            // PAYMENT VERIFIED
+            // ============================
+            //
+            // Now create actual order
+            // using existing checkout()
+            //
 
             const success = await checkout(
+
               shippingAddress,
+
               "Online",
+
               order_number,
+
               totalAmt || finalTotal,
+
               discountAmount,
-              selectedCoupon,
+
+              couponCode,
+
+              usergst,
+
+              phone,
+
+              shippingDetails
+
             );
 
 
-            if (success) {
+            // ============================
+            // ORDER CREATED
+            // ============================
 
-              /*
-               * ============================
-               * ORDER SUCCESS
-               * ============================
-               */
+            if (success) {
 
               navigate("/orderSuccess", {
 
@@ -251,10 +250,8 @@ const RazorpayPayment = () => {
 
             } else {
 
-              /*
-               * Payment was successful,
-               * but order creation failed.
-               */
+              // Payment succeeded but
+              // order creation failed
 
               navigate("/paymentFailed");
 
@@ -279,11 +276,9 @@ const RazorpayPayment = () => {
         },
 
 
-        /*
-         * ============================
-         * PAYMENT CANCELLED
-         * ============================
-         */
+        // ============================
+        // PAYMENT CANCELLED
+        // ============================
 
         modal: {
 
@@ -296,11 +291,9 @@ const RazorpayPayment = () => {
         },
 
 
-        /*
-         * ============================
-         * PREFILL
-         * ============================
-         */
+        // ============================
+        // PREFILL
+        // ============================
 
         prefill: {
 
@@ -308,14 +301,14 @@ const RazorpayPayment = () => {
 
           email: "user@example.com",
 
+          contact: phone || "",
+
         },
 
 
-        /*
-         * ============================
-         * THEME
-         * ============================
-         */
+        // ============================
+        // THEME
+        // ============================
 
         theme: {
 
@@ -326,18 +319,18 @@ const RazorpayPayment = () => {
       };
 
 
-      /*
-       * ============================
-       * OPEN RAZORPAY
-       * ============================
-       */
+      // ============================
+      // OPEN RAZORPAY
+      // ============================
 
-      const razorpay = new window.Razorpay(options);
+      const razorpay =
+        new window.Razorpay(options);
 
 
-      /*
-       * Payment failed event
-       */
+      // ============================
+      // PAYMENT FAILED
+      // ============================
+
       razorpay.on(
         "payment.failed",
         function (response) {
@@ -359,7 +352,6 @@ const RazorpayPayment = () => {
 
 
       razorpay.open();
-
 
     } catch (error) {
 

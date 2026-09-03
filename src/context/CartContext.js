@@ -121,7 +121,7 @@ export const CartProvider = ({ children }) => {
       const res = await api.post(
         "/cart-checkout",
         {
-          shipping_address: shippingAddress,
+          shipping_address: shippingAddress, 
           payment_method: paymentMethod,
           order_number: order_number,
           total_amount: totalAmt,

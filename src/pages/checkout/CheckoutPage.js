@@ -66,7 +66,7 @@ const CheckoutPage = () => {
     0
   );
 
-  const shippingCharge = subtotal >= 999 ? 0 : 99;
+  const shippingCharge = 0;
 
   const grandTotal =
     subtotal +
@@ -162,9 +162,13 @@ const CheckoutPage = () => {
         paymentMethod: "Online",
         order_number,
         usergst,
+        couponCode,
+        phone,
+        shippingDetails,
         selectedCoupon,
       },
     });
+
   };
   return (
     <div className="bg-[#FAFAFA] min-h-screen">
