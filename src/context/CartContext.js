@@ -114,7 +114,7 @@ export const CartProvider = ({ children }) => {
       console.error("Error updating quantity:", err);
     }
   };
-
+  
   // Checkout
   const checkout = async (shippingAddress, paymentMethod, order_number, totalAmt, discountAmount, selectedCoupon, userGst, phone, shippingDetails) => {
     try {

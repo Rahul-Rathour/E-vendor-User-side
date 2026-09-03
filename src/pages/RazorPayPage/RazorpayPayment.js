@@ -8,7 +8,7 @@ const RazorpayPayment = () => {
 
   const { state } = useLocation();
   const navigate = useNavigate();
-
+ 
   const { checkout } = useCart();
 
   const paymentStarted = useRef(false);
@@ -210,7 +210,7 @@ const RazorpayPayment = () => {
 
             const success = await checkout(
               shippingAddress,
-              "Online",
+              "Online", 
               order_number,
               totalAmt || finalTotal,
               discountAmount,

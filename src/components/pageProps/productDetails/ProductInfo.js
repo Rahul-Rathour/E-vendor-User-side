@@ -24,7 +24,7 @@ const ProductInfo = ({
       console.log("Share cancelled", err);
     }
   } else {
-    try {
+    try { 
       await navigator.clipboard.writeText(productUrl);
       alert("Product link copied to clipboard!");
     } catch (err) {

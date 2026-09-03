@@ -29,8 +29,8 @@ const OrderSummaryCard = ({
         0
     );
 
-    const shipping =
-        subtotal >= 999 ? 0 : 99;
+    // const shipping = subtotal >= 999 ? 0 : 99;
+    const shipping = 0;
 
     const grandTotal =
         subtotal +

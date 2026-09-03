@@ -13,7 +13,7 @@ import { useCart } from "../../context/CartContext";
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
-  const location = useLocation();
+  const location = useLocation(); 
   const { checkout } = useCart();
 
   const {
@@ -52,7 +52,7 @@ const CheckoutPage = () => {
   }, [navigate, user]);
 
   const calculateGSTAmount = (item) => {
-    const price = item.product.wholesale_price * item.quantity;
+    const price = item.product.price * item.quantity;
     return (price * item.product.gst) / 100;
   };
 
@@ -62,11 +62,11 @@ const CheckoutPage = () => {
   );
 
   const subtotal = cart.reduce(
-    (sum, item) => sum + item.product.wholesale_price * item.quantity,
+    (sum, item) => sum + item.product.price * item.quantity,
     0
   );
 
-  const shippingCharge = subtotal >= 999 ? 0 : 99;
+  const shippingCharge = 0;
 
   const grandTotal =
     subtotal +

@@ -12,7 +12,7 @@ const CheckoutOrderSummary = ({
   totalAmt,
   totalGST,
   discountAmount,
-  selectedCoupon,
+  selectedCoupon, 
   finalTotal,
   grandTotal,
   handleConfirmCheckout,
@@ -22,8 +22,7 @@ const CheckoutOrderSummary = ({
     0
   );
 
-  const shipping =
-    subtotal >= 999 ? 0 : 99;
+  const shipping = 0;
 
   return (
     <div
