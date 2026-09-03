@@ -11,33 +11,58 @@ const ProductInfo = ({
 }) => {
   const { addToCart } = useCart();
   const handleShare = async () => {
-  const productUrl = `https://blackhewzen.com/product/${productInfo.id}`;
+    const productUrl = `https://blackhewzen.com/product/${productInfo.id}`;
 
-  if (navigator.share) {
-    try {
-      await navigator.share({
-        title: productInfo.name,
-        text: `Check out this product: ${productInfo.name}`,
-        url: productUrl,
-      });
-    } catch (err) {
-      console.log("Share cancelled", err);
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: productInfo.name,
+          text: `Check out this product: ${productInfo.name}`,
+          url: productUrl,
+        });
+      } catch (err) {
+        console.log("Share cancelled", err);
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(productUrl);
+        alert("Product link copied to clipboard!");
+      } catch (err) {
+        console.error("Failed to copy link", err);
+      }
     }
-  } else {
-    try {
-      await navigator.clipboard.writeText(productUrl);
-      alert("Product link copied to clipboard!");
-    } catch (err) {
-      console.error("Failed to copy link", err);
-    }
-  }
-};
+  };
+  const discountPercentage =
+    productInfo.mrp_price > productInfo.price
+      ? Math.round(
+        ((productInfo.mrp_price - productInfo.price) / productInfo.mrp_price) * 100
+      )
+      : 0;
+
 
   return (
     <div className="flex flex-col gap-6">
       <h1 className="text-3xl font-semibold uppercase">{productInfo.name}</h1>
-      <p className="text-2xl font-bold text-brandColor">₹ {productInfo.price}</p>
+      <div className="flex items-center gap-3 flex-wrap">
+        {/* Selling Price */}
+        <p className="text-2xl font-bold text-brandColor">
+          ₹ {productInfo.price}
+        </p>
 
+        {/* MRP */}
+        {productInfo.mrp_price > productInfo.price && (
+          <p className="text-base text-gray-400 line-through">
+            ₹ {productInfo.mrp_price}
+          </p>
+        )}
+
+        {/* Discount */}
+        {discountPercentage > 0 && (
+          <p className="text-base font-semibold text-green-600">
+            {discountPercentage}% off
+          </p>
+        )}
+      </div>
       <div dangerouslySetInnerHTML={{ __html: productInfo.description }} />
 
       {/* Colors */}
@@ -72,13 +97,13 @@ const ProductInfo = ({
                 : "border-gray-400 hover:border-black"
                 }`}
             >
-              {size.size} 
+              {size.size}
               {/* ({size.qty}) */}
             </button>
-          ))} 
+          ))}
         </div>
         {availableSizes.length === 0 && (
-          <p className="text-red-500 text-sm">No sizes available for this color</p> 
+          <p className="text-red-500 text-sm">No sizes available for this color</p>
         )}
       </div>
 

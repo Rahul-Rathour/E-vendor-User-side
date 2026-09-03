@@ -17,6 +17,7 @@ function Items({ currentItems, orderType }) {
                 img={`${process.env.REACT_APP_API_URL}/public/${item.image}`}
                 productName={item.name}
                 price={item.price}       // 👈 send correct price
+                mrp={item.mrp_price}       // 👈 send correct price
                 color=""
                 badge=""
                 des={item.description}

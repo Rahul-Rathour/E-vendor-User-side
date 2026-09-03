@@ -57,6 +57,11 @@ const Product = (props) => {
     }
   };
 
+  const discountPercentage =
+  props.mrp > props.price
+    ? Math.round(((props.mrp - props.price) / props.mrp) * 100)
+    : 0;
+
   return (
 
     <div
@@ -173,38 +178,58 @@ const Product = (props) => {
           {props.productName}
         </h3>
 
-        {/* Price */}
-        <div className="flex items-center justify-between mt-3">
+{/* Price */}
+<div className="flex items-center justify-between mt-3">
 
-          <span className="text-xl font-bold text-black">
-            ₹ {props.price}
-          </span>
+  <div className="flex items-center gap-2 flex-wrap">
 
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              addToCart(props._id, props.price);
-            }}
-            className="
-              opacity-0
-              group-hover:opacity-100
-              transition-all
-              duration-300
-              bg-black
-              hover:bg-[#D4AF37]
-              hover:text-black
-              text-white
-              px-2
-              py-2
-              rounded-md
-              text-sm
-              font-medium
-            "
-          >
-            Add
-          </button>
+    {/* Selling Price */}
+    <span className="text-xl font-bold text-black">
+      ₹{props.price}
+    </span>
 
-        </div>
+    {/* MRP */}
+    {props.mrp > props.price && (
+      <span className="text-sm text-gray-400 line-through">
+        ₹{props.mrp}
+      </span>
+    )}
+
+    {/* Discount */}
+    {discountPercentage > 0 && (
+      <span className="text-sm font-semibold text-green-600">
+        {discountPercentage}% off
+      </span>
+    )}
+
+  </div>
+
+  <button
+    onClick={(e) => {
+      e.stopPropagation();
+      addToCart(props._id, props.price);
+    }}
+    className="
+      opacity-0
+      group-hover:opacity-100
+      transition-all
+      duration-300
+      bg-black
+      hover:bg-[#D4AF37]
+      hover:text-black
+      text-white
+      px-2
+      py-2
+      rounded-md
+      text-sm
+      font-medium
+    "
+  >
+    Add
+  </button>
+
+</div>
+
 
       </div>
 

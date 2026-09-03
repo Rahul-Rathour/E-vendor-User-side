@@ -15,7 +15,7 @@ const ProductDetailsTabs = ({ productInfo }) => {
       const parser = new DOMParser();
       const doc = parser.parseFromString(content, "text/html");
 
-      const rows = [];
+      const rows = []; 
 
       // Handle <p>Key: Value</p>
       doc.querySelectorAll("p").forEach((p) => {

@@ -160,7 +160,7 @@ const CartItemCard = ({
           <div>
 
             <p className="line-through text-gray-400">
-              ₹{Number(item.product.price).toFixed(2)}
+              ₹{Number(item.product.mrp_price).toFixed(2)}
             </p>
 
             <h3 className="text-3xl font-bold text-[#D4AF37]">

@@ -80,6 +80,7 @@ const BestSellers = () => {
               img={`${process.env.REACT_APP_API_URL}/public/${item.image}`}
               productName={item.name}
               price={item.price}
+              mrp={item.mrp_price}
               badge={true}
               badge_text="NEW"
               des={item.short_description}

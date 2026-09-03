@@ -8,7 +8,7 @@ const RazorpayPayment = () => {
 
   const { state } = useLocation();
   const navigate = useNavigate();
-
+ 
   const { checkout } = useCart();
 
   const paymentStarted = useRef(false);
